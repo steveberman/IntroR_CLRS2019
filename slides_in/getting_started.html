@@ -506,6 +506,15 @@ style.innerHTML = style_script;
 document.getElementsByTagName('head')[0].appendChild(style);
 </script>
 
+    <script src="getting_started_files/htmlwidgets-1.3/htmlwidgets.js"></script>
+    <script src="getting_started_files/jquery-1.12.4/jquery.min.js"></script>
+    <link href="getting_started_files/datatables-css-0.0.0/datatables-crosstalk.css" rel="stylesheet" />
+    <script src="getting_started_files/datatables-binding-0.7/datatables.js"></script>
+    <link href="getting_started_files/dt-core-1.10.16/css/jquery.dataTables.min.css" rel="stylesheet" />
+    <link href="getting_started_files/dt-core-1.10.16/css/jquery.dataTables.extra.css" rel="stylesheet" />
+    <script src="getting_started_files/dt-core-1.10.16/js/jquery.dataTables.min.js"></script>
+    <link href="getting_started_files/crosstalk-1.0.0/css/crosstalk.css" rel="stylesheet" />
+    <script src="getting_started_files/crosstalk-1.0.0/js/crosstalk.min.js"></script>
 </head>
 <body>
   <div class="reveal">
@@ -515,99 +524,230 @@ document.getElementsByTagName('head')[0].appendChild(style);
     <h1 class="title">Getting Started</h1>
 </section>
 
-<section id="options" class="slide level2">
+<section><section id="introduction-to-r" class="title-slide slide level1"><h1>Introduction to R</h1></section><section id="learning-objectives" class="slide level2">
+<h2>Learning Objectives</h2>
+<ol>
+<li>
+Install <code class="remark-inline-code">R</code>, R Studio and any of the many thousands of <code class="remark-inline-code">R</code> packages.
+</li>
+<li>
+Fetch and visualize data in <code class="remark-inline-code">R</code>.
+</li>
+<li>
+Model data in <code class="remark-inline-code">R</code> and save the results
+</li>
+</ol>
+</section><section id="requirements-for-this-workshop" class="slide level2">
+<h2>Requirements for this workshop</h2>
+<ol>
+<li>
+A functioning laptop (PC or Mac)
+</li>
+<li>
+Installation of <code class="remark-inline-code">R</code> and R Studio in advance of the workshop
+</li>
+<li>
+Patience, enthusiasm and a sense of humor
+</li>
+</ol>
+</section><section id="schedule" class="slide level2">
+<h2>Schedule</h2>
+<div id="htmlwidget-5dd82af099b49b645025" style="width:100%;height:auto;" class="datatables html-widget"></div>
+<script type="application/json" data-for="htmlwidget-5dd82af099b49b645025">{"x":{"filter":"none","fillContainer":false,"data":[["1:15 - 1:30","1:30 - 2:00","2:00 - 2:30","2:30 - 3:00","3:00 - 3:30","3:30 - 4:00","4:00 - 4:15"],["Preliminaries","Motivation and Fundamentals","Reading Data","Break (optional)","Visualizing Data","Fitting Model","Wrap-up"]],"container":"<table class=\"display\">\n  <thead>\n    <tr>\n      <th>Time<\/th>\n      <th>Activity<\/th>\n    <\/tr>\n  <\/thead>\n<\/table>","options":{"pageLength":7,"columnDefs":[{"className":"dt-center","targets":[0,1]}],"order":[],"autoWidth":false,"orderClasses":false,"lengthMenu":[7,10,25,50,100]}},"evals":[],"jsHooks":[]}</script>
+</section><section id="survey-how-many-people" class="slide level2">
+<h2>Survey: How many people…</h2>
+<ol>
+<li>
+Know <code class="remark-inline-code">R</code> as 18th letter of the modern English alphabet?
+</li>
+<li>
+Have heard of <code class="remark-inline-code">R</code> in an actuarial context?
+</li>
+<li>
+Know someone who uses <code class="remark-inline-code">R</code> for actuarial analyses?
+</li>
+<li>
+Have written an <code class="remark-inline-code">R</code> script?
+</li>
+<li>
+Understand that <code class="remark-inline-code">R</code> follows (not precedes) <code class="remark-inline-code">S</code>
+</li>
+<li>
+Know who Hadley Wikham is?
+</li>
+</ol>
+</section><section id="motivation" class="slide level2">
+<h2>Motivation</h2>
+<dl>
+<dt class="fragment">“Fundamentally learning about the world through data is really, really cool.”<br></dt>
+<dd class="fragment">Hadley Wickham, prolific R developer
+</dd>
+</dl>
+</section><section id="what-is-r" class="slide level2">
+<h2>What is <code class="remark-inline-code">R</code></h2>
+<div class="rlogo">
+<img src="Rlogo.png" width="100px">
+</div>
+<ol>
+<li>
+<code class="remark-inline-code">R</code> is a free software environment for statistical computing and graphics.
+</li>
+<li>
+<code class="remark-inline-code">R</code> != R Studio
+</li>
+</ol>
+<div class="rlogo">
+<img src="RStudio-Logo-Blue-Gray-125.png">
+</div>
+<ol>
+<li>
+RStudio is an integrated development environment (IDE) for <code class="remark-inline-code">R</code>. It includes a console, syntax-highlighting editor that supports direct code execution, as well as tools for plotting, history, debugging and workspace management.
+</li>
+</ol>
+</section><section id="what-is-r-1" class="slide level2">
+<h2>What is <code class="remark-inline-code">R</code></h2>
+<blockquote>
+<p><code class="remark-inline-code">R</code> has had a revolutionary effect on the way statistics are communicated.<br />
+— John Chambers</p>
+</blockquote>
+<font style="font-size:16pt">
+<ol>
+<li>
+<code class="remark-inline-code">R</code> provides a wide variety of statistical (linear and nonlinear modelling, classical statistical tests, time-series analysis, classification, clustering, …) and graphical techniques, and is highly extensible.
+</li>
+<li>
+One of <code class="remark-inline-code">R</code>’s strengths is the ease with which well-designed publication-quality plots can be produced, including mathematical symbols and formulae where needed. Great care has been taken over the defaults for the minor design choices in graphics, but the user retains full control.
+</li>
+<li>
+<code class="remark-inline-code">R</code> is available as Free Software under the terms of the Free Software Foundation’s GNU General Public License in source code form.
+</li>
+</ol>
+<p></font></p>
+</section><section id="what-is-r-2" class="slide level2">
+<h2>What is <code class="remark-inline-code">R</code>?</h2>
+<p><font style="font-size:16pt"> R is an integrated suite of software facilities for <strong>data manipulation, calculation and graphical display.</strong> It includes an effective <strong>data handling</strong> and storage facility, a suite of operators for <strong>calculations on arrays, in particular matrices</strong>, a large, coherent, integrated collection of intermediate tools for <strong>data analysis, graphical facilities for data analysis and display either on-screen or on hardcopy, and a well-developed, simple and effective programming language</strong> which includes conditionals, loops, user-defined recursive functions and input and output facilities.</p>
+<p>The term “environment” is intended to characterize it as a fully planned and coherent system, rather than an incremental accretion of very specific and inflexible tools, as is frequently the case with other data analysis software. </font></p>
+</section><section id="what-is-r-3" class="slide level2">
+<h2>What is <code class="remark-inline-code">R</code>?</h2>
+<p><font style="font-size:16pt"> <code class="remark-inline-code">R</code>, like <code class="remark-inline-code">S</code>, is designed around a true computer language, and it allows users to add additional functionality by defining new functions.</p>
+<p>Many users think of <code class="remark-inline-code">R</code> as a statistics system. We prefer to think of it of an environment within which statistical techniques are implemented. <code class="remark-inline-code">R</code> can be extended (easily) via packages. There are about eight packages supplied with the <code class="remark-inline-code">R</code> distribution and many more are available through the CRAN family of Internet sites covering a very wide range of modern statistics. </font></p>
+<p>(<a href="https://www.r-project.org/about.html" class="uri">https://www.r-project.org/about.html</a>)</p>
+</section></section>
+<section><section id="getting-started-in-r" class="title-slide slide level1"><h1>Getting Started in R</h1></section><section id="options" class="slide level2">
 <h2>Options</h2>
+<h3 id="available-in-toolsglobal-options">Available in Tools/Global Options</h3>
 <ul>
-<li>Don’t save history, or .Rdata</li>
-<li>Panes</li>
-<li>Editor color</li>
+<li>General: Save of history, or .Rdata (probably best if you don’t)</li>
+<li>General: Default version of R</li>
+<li>Appearance: Choose editor themes - can create custom</li>
+<li>Code / Diagnostics</li>
+<li>Pane Layout: Change panel positions</li>
+<li>Code / Completion: snippets, autocompletion</li>
 </ul>
-</section>
-<section id="other-options" class="slide level2">
-<h2>Other options</h2>
-<ul>
-<li>Code diagnostics</li>
-<li>Change panel positions</li>
-<li>Consider font and color</li>
-<li>Autocompletion</li>
-</ul>
-</section>
-<section id="script" class="slide level2">
+</section><section id="script" class="slide level2">
 <h2>Script</h2>
 <ul>
 <li>Create a script</li>
-<li>Save it, open it</li>
+<li>Save it, close it, open it</li>
 </ul>
-</section>
-<section id="keyboard-shortcuts" class="slide level2">
+</section><section id="keyboard-shortcuts" class="slide level2">
 <h2>Keyboard shortcuts</h2>
-<ul>
-<li>ALT+SHIFT+K</li>
-</ul>
-<p>My favories:</p>
-<ul>
-<li>ALT+-</li>
-<li>CTRL+ENTER</li>
-<li>CTRL+1</li>
-<li>CTRL+2</li>
-<li>CTRL+SHIFT+M</li>
-<li>CTRL+L</li>
-<li>CTRL+SHIFT+N</li>
-<li>CTRL+W</li>
-<li>CTRL+SHIFT+F</li>
-<li>CTRL+SHIFT+B</li>
-</ul>
-</section>
-<section id="code-execution" class="slide level2">
+<p><a href="https://support.rstudio.com/hc/en-us/articles/200711853-Keyboard-Shortcuts" class="uri">https://support.rstudio.com/hc/en-us/articles/200711853-Keyboard-Shortcuts</a></p>
+<table>
+<thead>
+<tr class="header">
+<th>Keyboard Shortcut</th>
+<th>Function</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>ALT+SHIFT+K</td>
+<td>Show quick reference</td>
+</tr>
+<tr class="even">
+<td>ALT+-</td>
+<td>Insert assignment operator (<code>&lt;-</code>)</td>
+</tr>
+<tr class="odd">
+<td>CTRL+ENTER</td>
+<td>Execute selected code</td>
+</tr>
+<tr class="even">
+<td>CTRL+1</td>
+<td>Go to Source Editor</td>
+</tr>
+<tr class="odd">
+<td>CTRL+2</td>
+<td>Go to Console</td>
+</tr>
+<tr class="even">
+<td>CTRL+SHIFT+M</td>
+<td>Insert pipe operator (<code>%&gt;%</code>)</td>
+</tr>
+<tr class="odd">
+<td>CTRL+L</td>
+<td>Clear console</td>
+</tr>
+<tr class="even">
+<td>CTRL+SHIFT+N</td>
+<td>Create new file</td>
+</tr>
+<tr class="odd">
+<td>CTRL+W</td>
+<td>Close active document</td>
+</tr>
+<tr class="even">
+<td>CTRL+SHIFT+F</td>
+<td>Find in files</td>
+</tr>
+<tr class="odd">
+<td>CTRL+SHIFT+B</td>
+<td>Build / rebuild package</td>
+</tr>
+</tbody>
+</table>
+</section><section id="code-execution" class="slide level2">
 <h2>Code execution</h2>
 <p>CTRL+ENTER</p>
 <p>90% of your code writing and execution will be done in scripts. Use the console for getting help or one-off operations like: package installation, light debugging.</p>
-</section>
-<section id="speaking-of-debugging" class="slide level2">
+</section><section id="speaking-of-debugging" class="slide level2">
 <h2>Speaking of debugging</h2>
-<p>R has a debugging framework. I rarely use it.</p>
-<p>The combination of environment pane and REPL does 98% of what I need. YMMV</p>
-</section>
-<section id="the-working-directory" class="slide level2">
+<p>R has a debugging framework….</p>
+</section><section id="the-working-directory" class="slide level2">
 <h2>The working directory</h2>
 <div class="sourceCode" id="cb1"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb1-1" title="1"><span class="kw">getwd</span>()</a>
 <a class="sourceLine" id="cb1-2" title="2"><span class="co">## [1] &quot;C:/Users/sberman/Documents/GitHub/IntroR_CLRS2019&quot;</span></a></code></pre></div>
 <p>You will probably never have a good reason to call <code>setwd()</code>. Use a project instead.</p>
-</section>
-<section id="projects" class="slide level2">
-<h2>Projects</h2>
+</section><section id="projects-.rproj" class="slide level2">
+<h2>Projects (*.Rproj)</h2>
 <ul>
 <li>Collect all of the files relevant to a project</li>
 <li>Automatically set the working directory</li>
 <li>Intermediate stuff:
 <ul>
-<li>Version control</li>
+<li>Version control (with Git)</li>
 <li>Package development</li>
-<li>CTRL-SHIFT-B</li>
 </ul></li>
 </ul>
-<p>Let’s all create one now.</p>
-</section>
-<section id="packages" class="slide level2">
+</section><section id="packages" class="slide level2">
 <h2>Packages</h2>
+<p>There are thousands!</p>
 <div class="sourceCode" id="cb2"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb2-1" title="1"><span class="kw">install.packages</span>(<span class="st">&#39;actuar&#39;</span>)</a>
 <a class="sourceLine" id="cb2-2" title="2"><span class="kw">library</span>(actuar)</a></code></pre></div>
-<p>Also have a look at the packages pane in RStudio.</p>
-</section>
-<section id="data-in-packages" class="slide level2">
+<p>Can install through Tools / Install packages as well.</p>
+</section><section id="data-in-packages" class="slide level2">
 <h2>Data in packages</h2>
-<div class="sourceCode" id="cb3"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb3-1" title="1"><span class="kw">data</span>(<span class="dt">package =</span> <span class="st">&#39;Lahman&#39;</span>)</a></code></pre></div>
-</section>
-<section id="installation-vs.-library" class="slide level2">
+<div class="sourceCode" id="cb3"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb3-1" title="1"><span class="kw">data</span>(<span class="dt">package =</span> <span class="st">&#39;Lahman&#39;</span>)   <span class="co"># load or list available datasets</span></a>
+<a class="sourceLine" id="cb3-2" title="2"><span class="kw">data</span>(iris)</a></code></pre></div>
+<p>datasets packages contains some sample data</p>
+</section><section id="installation-vs.-library" class="slide level2">
 <h2>Installation vs. library</h2>
-<ol type="1">
-<li><code>install.packages()</code> copies files to your computer.</li>
-<li><code>library()</code> finds those files and loads them into memory.</li>
-<li>When you turn off your computer, the files are unloaded from memory.</li>
-<li>Files on your computer don’t disappear when you turn off your computer.</li>
-</ol>
-</section>
-<section id="package-installation-folder" class="slide level2">
+<ul>
+<li>install.packages()` copies files to your computer.</li>
+<li><code>library()</code> finds those files and loads them into memory, where they remain until the session ends</li>
+</ul>
+</section><section id="package-installation-folder" class="slide level2">
 <h2>Package installation folder</h2>
 <div class="sourceCode" id="cb4"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb4-1" title="1"><span class="kw">.libPaths</span>()</a>
 <a class="sourceLine" id="cb4-2" title="2"><span class="co">## [1] &quot;C:/Users/sberman/Documents/R/win-library/3.6&quot;</span></a>
@@ -615,14 +755,10 @@ document.getElementsByTagName('head')[0].appendChild(style);
 <p>Create a “universal” library by creating a file called “.Renviron”.</p>
 <pre><code>R_LIBS=&quot;~/Rlibs&quot;</code></pre>
 <p><a href="https://stat.ethz.ch/R-manual/R-devel/library/base/html/Startup.html" class="uri">https://stat.ethz.ch/R-manual/R-devel/library/base/html/Startup.html</a></p>
-</section>
-<section id="exercise" class="slide level2">
+</section><section id="exercise" class="slide level2">
 <h2>Exercise</h2>
-<ol type="1">
-<li>Create a universal library. Ensure that it’s working by deleting one of the packages and reinstalling.</li>
-<li>Create an RStudio project to contain your work for this training.</li>
-</ol>
-</section>
+<p>Create an RStudio project to contain your work for this training.</p>
+</section></section>
     </div>
   </div>
 

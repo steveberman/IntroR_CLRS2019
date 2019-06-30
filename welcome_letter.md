@@ -26,4 +26,6 @@ Thanks, and we look forward to meeting you and helping you learn R!
 
 Steve Berman, FCAS, CSPA, sberman@deloitte.com
 
-Scott G. Sobel, FCAS, MAAA scott.sobel@oliverwyman.com (?)
+Scott G. Sobel, FCAS, MAAA, scott.sobel@oliverwyman.com
+
+Saumil Padhya, spadhya@deloitte.com

@@ -16,6 +16,105 @@ output:
 source('common.R')
 ```
 
+# Introduction to R
+
+## Learning Objectives
+
+<ol>
+  <li> Install <code class="remark-inline-code">R</code>, R Studio and any of the many thousands of <code class="remark-inline-code">R</code> packages. </li>
+  <li> Fetch and visualize data in <code class="remark-inline-code">R</code>. </li>
+  <li> Model data in <code class="remark-inline-code">R</code> and save the results </li>
+</ol>
+
+## Requirements for this workshop
+
+<ol>
+  <li> A functioning laptop (PC or Mac) </li>
+  <li> Installation of <code class="remark-inline-code">R</code> and R Studio in advance of the workshop </li>
+  <li> Patience, enthusiasm and a sense of humor </li>
+</ol>
+
+## Schedule
+```{r eval=require('DT'), tidy=FALSE, echo=FALSE}
+sch <- data.frame(Time = c("1:15 - 1:30", "1:30 - 2:00", "2:00 - 2:30",
+  "2:30 - 3:00", "3:00 - 3:30", "3:30 - 4:00", "4:00 - 4:15"),
+  Activity = c("Preliminaries", "Motivation and Fundamentals", "Reading Data",
+    "Break (optional)", "Visualizing Data", "Fitting Model", "Wrap-up"))
+
+DT::datatable(
+  sch,
+  rownames = FALSE,
+  filter = 'none',
+  selection = 'none',
+  fillContainer = FALSE, options = list(
+    pageLength = 7,
+    columnDefs = list(
+      list(className = 'dt-center', targets = list(0,1))#,
+      #list(width = list('20%', '80%'), targets = list(0,1))
+    )
+  ))
+```
+
+## Survey: How many people...
+
+<ol>
+  <li> Know <code class="remark-inline-code">R</code> as 18th letter of the modern English alphabet? </li>
+  <li> Have heard of <code class="remark-inline-code">R</code> in an actuarial context? </li>
+  <li> Know someone who uses <code class="remark-inline-code">R</code> for actuarial analyses? </li>
+  <li> Have written an <code class="remark-inline-code">R</code> script? </li>
+  <li> Understand that <code class="remark-inline-code">R</code> follows (not precedes) <code class="remark-inline-code">S</code> </li>
+  <li> Know who Hadley Wikham is? </li>
+</ol>
+
+## Motivation
+> "Fundamentally learning about the world through data is really, really cool."<br>
+> ~ Hadley Wickham, prolific R developer
+
+## What is <code class="remark-inline-code">R</code>
+<div class="rlogo"> <img src="rlogo.png" width="100px"> </div>
+
+<ol>
+  <li> <code class="remark-inline-code">R</code> is a free software environment for statistical computing and graphics.</li>
+  <li> <code class="remark-inline-code">R</code> != R Studio  </li>
+</ol>
+
+<div class="rlogo"> <img src="RStudio-Logo-Blue-Gray-125.png"> </div>
+<ol>
+  <li> RStudio is an integrated development environment (IDE) for <code class="remark-inline-code">R</code>. It includes a console, syntax-highlighting editor that supports direct code execution, as well as tools for plotting, history, debugging and workspace management.</li>
+</ol>
+
+## What is <code class="remark-inline-code">R</code>
+
+> <code class="remark-inline-code">R</code> has had a revolutionary effect on the way statistics are communicated.  
+> --- John Chambers
+
+<font style="font-size:16pt">
+<ol>
+  <li> <code class="remark-inline-code">R</code> provides a wide variety of statistical (linear and nonlinear modelling, classical statistical tests, time-series analysis, classification, clustering, ...) and graphical techniques, and is highly extensible. </li>
+  <li> One of <code class="remark-inline-code">R</code>'s strengths is the ease with which well-designed publication-quality plots can be produced, including mathematical symbols and formulae where needed. Great care has been taken over the defaults for the minor design choices in graphics, but the user retains full control.</li>
+  <li> <code class="remark-inline-code">R</code> is available as Free Software under the terms of the Free Software Foundation's GNU General Public License in source code form.</li>
+</ol>
+</font>
+
+## What is <code class="remark-inline-code">R</code>?
+<font style="font-size:16pt">
+R is an integrated suite of software facilities for **data manipulation, calculation and graphical display.** It includes an effective **data handling** and storage facility, a suite of operators for **calculations on arrays, in particular matrices**, a large, coherent, integrated collection of intermediate tools for **data analysis, graphical facilities for data analysis and display either on-screen or on hardcopy, and a well-developed, simple and effective programming language** which includes conditionals, loops, user-defined recursive functions and input and output facilities.
+
+The term "environment" is intended to characterize it as a fully planned and coherent system, rather than an incremental accretion of very specific and inflexible tools, as is frequently the case with other data analysis software.
+</font>
+
+## What is <code class="remark-inline-code">R</code>?
+<font style="font-size:16pt">
+<code class="remark-inline-code">R</code>, like <code class="remark-inline-code">S</code>, is designed around a true computer language, and it allows users to add additional functionality by defining new functions. 
+
+Many users think of <code class="remark-inline-code">R</code> as a statistics system. We prefer to think of it of an environment within which statistical techniques are implemented. <code class="remark-inline-code">R</code> can be extended (easily) via packages. There are about eight packages supplied with the <code class="remark-inline-code">R</code> distribution and many more are available through the CRAN family of Internet sites covering a very wide range of modern statistics.
+</font>
+
+(https://www.r-project.org/about.html)
+
+
+# Getting Started in R
+
 ##  Options
 
 ### Available in Tools/Global Options
