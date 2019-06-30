@@ -1,0 +1,122 @@
+---
+title: Getting Started
+output:
+  revealjs::revealjs_presentation:
+    center: no
+    css: ../css/revealOpts.css
+    reveal_plugins:
+    - notes
+    - zoom
+    self_contained: false
+    theme: solarized
+    transition: slide
+---
+
+```{r include=FALSE}
+source('common.R')
+```
+
+##  Options
+
+### Available in Tools/Global Options
+
+* General: Save of history, or .Rdata (probably best if you don't)
+* General: Default version of R
+* Appearance: Choose editor themes - can create custom
+* Code / Diagnostics
+* Pane Layout: Change panel positions
+* Code / Completion: snippets, autocompletion
+    
+## Script
+
+* Create a script
+* Save it, close it, open it
+
+## Keyboard shortcuts
+
+https://support.rstudio.com/hc/en-us/articles/200711853-Keyboard-Shortcuts
+
+Keyboard Shortcut | Function
+------------------| -----------------------------------------
+ALT+SHIFT+K       | Show quick reference
+ALT+-             | Insert assignment operator (`<-`)
+CTRL+ENTER        | Execute selected code
+CTRL+1            | Go to Source Editor
+CTRL+2            | Go to Console
+CTRL+SHIFT+M      | Insert pipe operator (`%>%`)
+CTRL+L            | Clear console
+CTRL+SHIFT+N      | Create new file
+CTRL+W            | Close active document
+CTRL+SHIFT+F      | Find in files
+CTRL+SHIFT+B      | Build / rebuild package
+
+## Code execution
+
+CTRL+ENTER
+
+90% of your code writing and execution will be done in scripts. Use the console for getting help or one-off operations like: package installation, light debugging.
+
+## Speaking of debugging
+
+R has a debugging framework....
+
+
+
+## The working directory
+
+```{r}
+getwd()
+```
+
+You will probably never have a good reason to call `setwd()`. Use a project instead.
+
+## Projects (*.Rproj)
+
+* Collect all of the files relevant to a project
+* Automatically set the working directory 
+* Intermediate stuff:
+  * Version control (with Git)
+  * Package development
+
+## Packages
+
+There are thousands!
+
+```{r eval=FALSE}
+install.packages('actuar')
+library(actuar)
+```
+
+Can install through Tools / Install packages as well.
+
+## Data in packages
+
+```{r eval=FALSE}
+data(package = 'Lahman')   # load or list available datasets
+data(iris)
+```
+
+datasets packages contains some sample data
+
+## Installation vs. library
+
+* install.packages()` copies files to your computer.
+* `library()` finds those files and loads them into memory, where they remain until the session ends
+
+## Package installation folder
+
+```{r}
+.libPaths()
+```
+
+Create a "universal" library by creating a file called ".Renviron".
+
+```
+R_LIBS="~/Rlibs"
+```
+
+https://stat.ethz.ch/R-manual/R-devel/library/base/html/Startup.html
+
+## Exercise
+
+Create an RStudio project to contain your work for this training.

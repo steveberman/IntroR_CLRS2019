@@ -1,0 +1,6 @@
+source('common.R')
+getwd()
+## install.packages('actuar')
+## library(actuar)
+## data(package = 'Lahman')
+.libPaths()
