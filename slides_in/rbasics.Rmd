@@ -1,0 +1,126 @@
+---
+title: "R basics"
+output:
+  slidy_presentation:
+    duration: 45
+    fig_height: 3
+    fig_width: 6
+  beamer_presentation:
+    fonttheme: professionalfonts
+---
+
+# Basics
+
+## Assignment
+
+Use the <code class="remark-inline-code"><-</code> operator.  The equal sign also works.
+
+## Libraries
+* <code class="remark-inline-code">library()</code>: see a list of available packages
+* Use that to load a library as well: <code class="remark-inline-code">library(MASS)</code>
+
+## Console window
+
+* Can run individual commands, including retrieving or changing existing variables.
+* Good for debugging.
+* Longer programming is done through scripts.
+
+## Get help!
+
+* <code class="remark-inline-code">?</code> brings up help on a specific function
+* <code class="remark-inline-code">??</code> performs a search on a term, if you don't know the exact name
+
+## Mathematical operations:
+
+* Addition, subtraction, etc. all work as expected
+* Use `**` for exponentiation, `**` for modulus, `//` for integer division, etc. 
+
+## Functions:
+* Called similar to Excel:
+<code class="remark-inline-code">abs(-3.5)</code> --> 3.5
+* Parentheses required even if no parameters
+* Some functions have optional parameters - can enter parameters in order or reference by name
+
+## Comments, whitespace:
+* Comments start with `#` (no multiple line comment)
+* White space, indentations ignored by R
+
+## Workspaces:
+* Use Load Workspace / Save Workspace for saving and restoring objects (variables and functions) but not scripts
+
+# Other starting considerations:
+
+* Primitives (<code class="remark-inline-code">numeric, logical, character</code>)
+* Other data types (<code class="remark-inline-code">list, vector, matrix, factor, "data.frame"</code>)
+* The structure function (<code class="remark-inline-code">str</code>): show structure of an R object</li>
+* The <code class="remark-inline-code">tidyverse</code>: a small universe of really useful packages (<code class="remark-inline-code">install.packages(pkgs='tidyverse')</code>)</li>
+  <li>Styleguide <a href="http://adv-r.had.co.nz/Style.html">http://adv-r.had.co.nz/Style.html</a></li>
+</ol>
+
+# Read Data
+
+<ol>
+  <li> Comma-separated values (<code class="remark-inline-code">read.csv, readr::read_csv</code>)</li>
+  <li> Comma-separated values (<code class="remark-inline-code">readxl::read_excel</code>)</li>
+</ol>
+
+Other data types are readable.  There are packages for SAS, SQL, Word, PDF, etc.
+
+# Exercise 1
+
+Locate the <code class="remark-inline-code">mtcars.csv</code> file that comes with <code class="remark-inline-code">readr</code>
+```{r}
+library(readr)
+readr_example("mtcars.csv")
+```
+<exercise>Read this file using <code class="remark-inline-code">read.csv</code> and assign this to object <code class="remark-inline-code">cas01</code><br>
+<exercise>Read this file using <code class="remark-inline-code">read_csv</code> and assign this to object <code class="remark-inline-code">cas02</code><br>
+What is the difference between the files?
+</exercise>
+
+# Solution 1
+
+```{r, message=FALSE}
+fn <- readr_example("mtcars.csv")
+cas01 <- read.csv(file = fn)
+cas02 <- read_csv(file = fn)
+class(cas01)
+class(cas02)
+```
+
+# Exercise 2
+
+Locate the <code class="remark-inline-code">mtcars.csv</code> file that comes with <code class="remark-inline-code">readr</code>
+```{r}
+library(readxl)
+readxl_example('deaths.xlsx')
+```
+<exercise>Read this file using <code class="remark-inline-code">read_excel</code> and assign this to object <code class="remark-inline-code">cas03</code><br>
+How many row and columns does this dataframe contain?
+</exercise>
+
+# Solution 2: Try #1
+
+```{r, message=FALSE}
+fn <- readxl_example('deaths.xlsx')
+cas03 <- read.csv(fn)
+str(cas03)
+```
+
+# Solution 2: Try #2
+
+```{r}
+fn <- readxl_example('deaths.xlsx')
+cas03 <- read_excel(fn, sheet = 'arts' , range = 'a5:f15')
+str(cas03)
+```
+
+
+# Read in CAS Data
+```{r}
+#auto_dat_cas <- read_csv('http://www.casact.org/research/reserve_data/ppauto_pos.csv')
+```
+
+
+
+
