@@ -30,10 +30,26 @@ Use the <code class="remark-inline-code"><-</code> operator.  The equal sign als
 * <code class="remark-inline-code">?</code> brings up help on a specific function
 * <code class="remark-inline-code">??</code> performs a search on a term, if you don't know the exact name
 
-## Mathematical operations:
+## Variable types:
+
+### Primitives include: 
+* numeric
+* logical (TRUE / FALSE)
+* character
+
+### Use functions like <code class="remark-inline-code">is.numeric, is.logical</code> to test for a type.
+### Use functions like <code class="remark-inline-code">as.numeric, as.integer</code> to convert to a type.
+
+## Operations:
+
+### Mathematical
 
 * Addition, subtraction, etc. all work as expected
-* Use `**` for exponentiation, `**` for modulus, `//` for integer division, etc. 
+* Use `**` for exponentiation, `%%` for modulus, `//` for integer division, etc. 
+
+### Logical
+* Test for equality with `==`, inequality with `!=`
+* And `&&`, or `||`, not `!`
 
 ## Functions:
 * Called similar to Excel:
@@ -48,16 +64,39 @@ Use the <code class="remark-inline-code"><-</code> operator.  The equal sign als
 ## Workspaces:
 * Use Load Workspace / Save Workspace for saving and restoring objects (variables and functions) but not scripts
 
+
 # Other starting considerations:
 
-* Primitives (<code class="remark-inline-code">numeric, logical, character</code>)
-* Other data types (<code class="remark-inline-code">list, vector, matrix, factor, "data.frame"</code>)
+* Other data types (<code class="remark-inline-code">list, vector, matrix, factor, data.frame</code>)
 * The structure function (<code class="remark-inline-code">str</code>): show structure of an R object</li>
 * The <code class="remark-inline-code">tidyverse</code>: a small universe of really useful packages (<code class="remark-inline-code">install.packages(pkgs='tidyverse')</code>)</li>
-  <li>Styleguide <a href="http://adv-r.had.co.nz/Style.html">http://adv-r.had.co.nz/Style.html</a></li>
+  <li>Styleguide: <a href="http://adv-r.had.co.nz/Style.html">http://adv-r.had.co.nz/Style.html</a></li>
 </ol>
 
-# Read Data
+# Basics - Exercises
+
+## Exercise 1:
+
+Set variables a, b, and c.  Then find the solutions to the quadratic equation ax^2 + bx + c
+
+
+# Basics - Solutions
+
+## Solution 1:
+
+```{r, message=FALSE} 
+a <- 7
+b <- 3
+c <- 2
+
+pos_root <- (-b + sqrt(b**2 - 4 * a * c)) / (2*a)
+neg_root <- (-b - sqrt(b**2 - 4 * a * c)) / (2*a)
+
+print(pos_root)
+print(neg_root)
+```
+
+# Reading Data
 
 <ol>
   <li> Comma-separated values (<code class="remark-inline-code">read.csv, readr::read_csv</code>)</li>
@@ -80,7 +119,7 @@ What is the difference between the files?
 
 # Solution 1
 
-```{r, message=FALSE}
+```{r, message=FALSE} 
 fn <- readr_example("mtcars.csv")
 cas01 <- read.csv(file = fn)
 cas02 <- read_csv(file = fn)
