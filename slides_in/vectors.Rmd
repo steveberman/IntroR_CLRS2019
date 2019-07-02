@@ -41,7 +41,7 @@ Vectors are constructed in one of several ways:
 * Concatenation
 * Growth by assignment
 
-## Sequences
+## `seq`
 
 `seq` is used often to generate a sequence of values. The colon operator `:` is a shortcut for a sequence of integers.
 
@@ -63,7 +63,7 @@ head(i)
 
 ## Concatenation
 
-The `c()` function will concatenate values.
+The `c()` function will concatenate scalars or vectors to form a vector.
 
 ```{r results='hide'}
 i <- c(1, 2, 3, 4, 5)
@@ -76,15 +76,6 @@ l <- c(1:5, 6:10)
 i = c(1, 2, 3, 4, 5)
 j = c(6, 7, 8, 9, 10)
 k = c(i, j)
-#block_i[1:5] = "red"
-#block_j[1:5] = "blue"
-#block_k[1:5] = "red"
-#block_k[6:10] <- "blue"
-
-#block_i
-#block_j
-
-#block_k
 ```
 
 ## Growth by assignment
@@ -104,6 +95,7 @@ Vectors may be accessed by their numeric indices. Remember, ':' is shorthand to 
 ```{r }
 set.seed(1234)
 e <- rnorm(100)
+# different filters
 e[1]
 e[1:4]
 e[c(1,3)]
@@ -124,7 +116,7 @@ i[b]
 
 ## `which`
 
-The `which` function returns indices that match a logical expression.
+The `which` function returns indices that match a logical expression (rather than the values).
 
 ```{r }
 i <- 11:20
@@ -149,6 +141,7 @@ head(mixedMonths)
 Get lots of months with the `size` parameter:
 ```{r }
 set.seed(1234)
+# sample with replacement
 lotsOfMonths <- sample(months, size = 100, replace = TRUE)
 head(lotsOfMonths)
 ```
@@ -177,13 +170,16 @@ set.seed(1234)
 x <- sample(1:10)
 x
 order(x)
-x[order(x)]
+y1 <- x[order(x)]
+print(y1)
+y2 <- sort(x)
+print(y2)
 ```
 
 
 ## Vector arithmetic
 
-Vectors may be used in arithmetic operations. 
+Vectors may be used in arithmetic operations.  A large number of functions in R are vectorized, meaning that they can act on vectors and return vectors. 
   
 ```{r eval=FALSE}
 B0 <- 5
@@ -191,20 +187,18 @@ B1 <- 1.5
 
 set.seed(1234)
 
-e <- rnorm(N, mean = 0, sd = 1)
+e <- rnorm(100, mean = 0, sd = 1)
 X1 <- rep(seq(1,10),10)
 
 Y <- B0 + B1 * X1 + e
+
 ```
 
 Y is now a vector with length equal to the longest vector used in the calculation.
 
-Question: B0 and B1 are vectors of length 1. 
-
-X1 and e are vectors of length 100. 
+B0 and B1 are scalars. X1 and e are vectors of length 100. 
 
 How are they combined?
-
 
 ## Recycling
 
@@ -234,9 +228,9 @@ x %in% y
 
 * `union`
 * `intersect`
-* `setdiff`
-* `setequal`
-* `is.element`
+* `setdiff` - find differences
+* `setequal` - test for equality
+* `is.element` - search for single element
 
 ```{r eval = FALSE}
 ?union
@@ -307,7 +301,7 @@ sample(LastName, 100, replace = TRUE)
 
 ## Lists
 
-Lists have data of arbitrary complexity. Any type, any length. Note the new `[[ ]]` double bracket operator.
+Lists have data of arbitrary complexity. Any type, any length. In a sense, they are vectors of variants.  Note the new `[[ ]]` double bracket operator.
 
 ```{r }
 x <- list()
@@ -376,6 +370,7 @@ Two reasons:
 
 1. It's expressive. A loop is a lot of code which does little to clarify intent. `lapply` indicates that we want to apply the same function to each element of a list. Think of a formula that exists as a column in a spreadsheet.
 2. It's easier to type at an interactive console. In its very early days, `S` was fully interactive. Typing a `for` loop at the console is a tedius and unnecessary task.
+3. It's often much faster.
 
 ## Summary functions
 

@@ -436,7 +436,7 @@ list-style-type: none;
 <div class="sourceCode" id="cb1"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb1-1" title="1"><span class="kw">set.seed</span>(<span class="dv">1234</span>)</a>
 <a class="sourceLine" id="cb1-2" title="2">e  &lt;-<span class="st"> </span><span class="kw">rnorm</span>(<span class="dv">100</span>)</a>
 <a class="sourceLine" id="cb1-3" title="3">X1 &lt;-<span class="st"> </span><span class="dv">1</span><span class="op">:</span><span class="dv">10</span></a></code></pre></div>
-<p>Here, <code>e</code> is a vector with <code>N</code> values. <code>X1</code> is the sequence of integers from 1 through 10.</p>
+<p>Here, <code>e</code> is a vector with <code>N</code> random normally distributed values. <code>X1</code> is the sequence of integers from 1 through 10.</p>
 <p>Vectors can grow and shrink automatically. No need to move cells around on a sheet. No need to copy formulas or change named ranges.</p>
 </div>
 <div id="vector-properties" class="slide section level2">
@@ -451,7 +451,7 @@ list-style-type: none;
 <ul>
 <li>Higher dimensions are possible via matrices and arrays</li>
 </ul></li>
-<li>Possible to add metadata (like names) via attributes</li>
+<li>Possible to add metadata to variables (like names) via attributes</li>
 </ul>
 </div>
 <div id="vector-construction" class="slide section level2">
@@ -466,12 +466,13 @@ list-style-type: none;
 <li>Growth by assignment</li>
 </ul>
 </div>
-<div id="seq" class="slide section level2">
-<h1><code>seq</code></h1>
+<div id="sequences" class="slide section level2">
+<h1>Sequences</h1>
 <p><code>seq</code> is used often to generate a sequence of values. The colon operator <code>:</code> is a shortcut for a sequence of integers.</p>
-<div class="sourceCode" id="cb2"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb2-1" title="1">pies =<span class="st"> </span><span class="kw">seq</span>(<span class="dt">from =</span> <span class="dv">0</span>, <span class="dt">by =</span> pi, <span class="dt">length.out =</span> <span class="dv">5</span>)</a>
-<a class="sourceLine" id="cb2-2" title="2">i &lt;-<span class="st"> </span><span class="dv">1</span><span class="op">:</span><span class="dv">5</span></a>
-<a class="sourceLine" id="cb2-3" title="3">year =<span class="st"> </span><span class="dv">2000</span><span class="op">:</span><span class="dv">2004</span></a></code></pre></div>
+<div class="sourceCode" id="cb2"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb2-1" title="1">pies &lt;-<span class="st"> </span><span class="kw">seq</span>(<span class="dt">from =</span> <span class="dv">0</span>, <span class="dt">by =</span> pi, <span class="dt">length.out =</span> <span class="dv">5</span>)</a>
+<a class="sourceLine" id="cb2-2" title="2">election_years &lt;-<span class="st"> </span><span class="kw">seq</span>(<span class="dt">from=</span><span class="dv">2000</span>, <span class="dt">to=</span><span class="dv">2020</span>, <span class="dt">by=</span><span class="dv">4</span>)</a>
+<a class="sourceLine" id="cb2-3" title="3">i &lt;-<span class="st"> </span><span class="dv">1</span><span class="op">:</span><span class="dv">5</span></a>
+<a class="sourceLine" id="cb2-4" title="4">year =<span class="st"> </span><span class="dv">2000</span><span class="op">:</span><span class="dv">2004</span></a></code></pre></div>
 </div>
 <div id="rep" class="slide section level2">
 <h1><code>rep</code></h1>
@@ -482,7 +483,7 @@ list-style-type: none;
 </div>
 <div id="concatenation" class="slide section level2">
 <h1>Concatenation</h1>
-<p>The <code>c()</code> function will concatenate values.</p>
+<p>The <code>c()</code> function will concatenate scalars or vectors to form a vector.</p>
 <div class="sourceCode" id="cb5"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb5-1" title="1">i &lt;-<span class="st"> </span><span class="kw">c</span>(<span class="dv">1</span>, <span class="dv">2</span>, <span class="dv">3</span>, <span class="dv">4</span>, <span class="dv">5</span>)</a>
 <a class="sourceLine" id="cb5-2" title="2">j &lt;-<span class="st"> </span><span class="kw">c</span>(<span class="dv">6</span>, <span class="dv">7</span>, <span class="dv">8</span>, <span class="dv">9</span>, <span class="dv">10</span>)</a>
 <a class="sourceLine" id="cb5-3" title="3">k &lt;-<span class="st"> </span><span class="kw">c</span>(i, j)</a>
@@ -505,7 +506,8 @@ list-style-type: none;
 <p>Vectors may be accessed by their numeric indices. Remember, ‘:’ is shorthand to generate a sequence.</p>
 <div class="sourceCode" id="cb8"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb8-1" title="1"><span class="kw">set.seed</span>(<span class="dv">1234</span>)</a>
 <a class="sourceLine" id="cb8-2" title="2">e &lt;-<span class="st"> </span><span class="kw">rnorm</span>(<span class="dv">100</span>)</a>
-<a class="sourceLine" id="cb8-3" title="3">e[<span class="dv">1</span>]</a></code></pre></div>
+<a class="sourceLine" id="cb8-3" title="3"><span class="co"># different filters</span></a>
+<a class="sourceLine" id="cb8-4" title="4">e[<span class="dv">1</span>]</a></code></pre></div>
 <pre><code>## [1] -1.207066</code></pre>
 <div class="sourceCode" id="cb10"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb10-1" title="1">e[<span class="dv">1</span><span class="op">:</span><span class="dv">4</span>]</a></code></pre></div>
 <pre><code>## [1] -1.2070657  0.2774292  1.0844412 -2.3456977</code></pre>
@@ -528,7 +530,7 @@ list-style-type: none;
 </div>
 <div id="which" class="slide section level2">
 <h1><code>which</code></h1>
-<p>The <code>which</code> function returns indices that match a logical expression.</p>
+<p>The <code>which</code> function returns indices that match a logical expression (rather than the values).</p>
 <div class="sourceCode" id="cb22"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb22-1" title="1">i &lt;-<span class="st"> </span><span class="dv">11</span><span class="op">:</span><span class="dv">20</span></a>
 <a class="sourceLine" id="cb22-2" title="2"><span class="kw">which</span>(i <span class="op">&gt;</span><span class="st"> </span><span class="dv">12</span>)</a></code></pre></div>
 <pre><code>## [1]  3  4  5  6  7  8  9 10</code></pre>
@@ -548,8 +550,9 @@ list-style-type: none;
 <pre><code>## [1] &quot;December&quot; &quot;October&quot;  &quot;June&quot;     &quot;May&quot;      &quot;April&quot;    &quot;July&quot;</code></pre>
 <p>Get lots of months with the <code>size</code> parameter:</p>
 <div class="sourceCode" id="cb28"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb28-1" title="1"><span class="kw">set.seed</span>(<span class="dv">1234</span>)</a>
-<a class="sourceLine" id="cb28-2" title="2">lotsOfMonths &lt;-<span class="st"> </span><span class="kw">sample</span>(months, <span class="dt">size =</span> <span class="dv">100</span>, <span class="dt">replace =</span> <span class="ot">TRUE</span>)</a>
-<a class="sourceLine" id="cb28-3" title="3"><span class="kw">head</span>(lotsOfMonths)</a></code></pre></div>
+<a class="sourceLine" id="cb28-2" title="2"><span class="co"># sample with replacement</span></a>
+<a class="sourceLine" id="cb28-3" title="3">lotsOfMonths &lt;-<span class="st"> </span><span class="kw">sample</span>(months, <span class="dt">size =</span> <span class="dv">100</span>, <span class="dt">replace =</span> <span class="ot">TRUE</span>)</a>
+<a class="sourceLine" id="cb28-4" title="4"><span class="kw">head</span>(lotsOfMonths)</a></code></pre></div>
 <pre><code>## [1] &quot;December&quot;  &quot;October&quot;   &quot;June&quot;      &quot;May&quot;       &quot;December&quot;  &quot;September&quot;</code></pre>
 </div>
 <div id="sample-ii" class="slide section level2">
@@ -574,21 +577,25 @@ list-style-type: none;
 <pre><code>##  [1] 10  6  5  4  1  8  2  7  9  3</code></pre>
 <div class="sourceCode" id="cb36"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb36-1" title="1"><span class="kw">order</span>(x)</a></code></pre></div>
 <pre><code>##  [1]  5  7 10  4  3  2  8  6  9  1</code></pre>
-<div class="sourceCode" id="cb38"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb38-1" title="1">x[<span class="kw">order</span>(x)]</a></code></pre></div>
+<div class="sourceCode" id="cb38"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb38-1" title="1">y1 &lt;-<span class="st"> </span>x[<span class="kw">order</span>(x)]</a>
+<a class="sourceLine" id="cb38-2" title="2"><span class="kw">print</span>(y1)</a></code></pre></div>
+<pre><code>##  [1]  1  2  3  4  5  6  7  8  9 10</code></pre>
+<div class="sourceCode" id="cb40"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb40-1" title="1">y2 &lt;-<span class="st"> </span><span class="kw">sort</span>(x)</a>
+<a class="sourceLine" id="cb40-2" title="2"><span class="kw">print</span>(y2)</a></code></pre></div>
 <pre><code>##  [1]  1  2  3  4  5  6  7  8  9 10</code></pre>
 </div>
 <div id="vector-arithmetic" class="slide section level2">
 <h1>Vector arithmetic</h1>
 <p>Vectors may be used in arithmetic operations.</p>
-<div class="sourceCode" id="cb40"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb40-1" title="1">B0 &lt;-<span class="st"> </span><span class="dv">5</span></a>
-<a class="sourceLine" id="cb40-2" title="2">B1 &lt;-<span class="st"> </span><span class="fl">1.5</span></a>
-<a class="sourceLine" id="cb40-3" title="3"></a>
-<a class="sourceLine" id="cb40-4" title="4"><span class="kw">set.seed</span>(<span class="dv">1234</span>)</a>
-<a class="sourceLine" id="cb40-5" title="5"></a>
-<a class="sourceLine" id="cb40-6" title="6">e &lt;-<span class="st"> </span><span class="kw">rnorm</span>(N, <span class="dt">mean =</span> <span class="dv">0</span>, <span class="dt">sd =</span> <span class="dv">1</span>)</a>
-<a class="sourceLine" id="cb40-7" title="7">X1 &lt;-<span class="st"> </span><span class="kw">rep</span>(<span class="kw">seq</span>(<span class="dv">1</span>,<span class="dv">10</span>),<span class="dv">10</span>)</a>
-<a class="sourceLine" id="cb40-8" title="8"></a>
-<a class="sourceLine" id="cb40-9" title="9">Y &lt;-<span class="st"> </span>B0 <span class="op">+</span><span class="st"> </span>B1 <span class="op">*</span><span class="st"> </span>X1 <span class="op">+</span><span class="st"> </span>e</a></code></pre></div>
+<div class="sourceCode" id="cb42"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb42-1" title="1">B0 &lt;-<span class="st"> </span><span class="dv">5</span></a>
+<a class="sourceLine" id="cb42-2" title="2">B1 &lt;-<span class="st"> </span><span class="fl">1.5</span></a>
+<a class="sourceLine" id="cb42-3" title="3"></a>
+<a class="sourceLine" id="cb42-4" title="4"><span class="kw">set.seed</span>(<span class="dv">1234</span>)</a>
+<a class="sourceLine" id="cb42-5" title="5"></a>
+<a class="sourceLine" id="cb42-6" title="6">e &lt;-<span class="st"> </span><span class="kw">rnorm</span>(N, <span class="dt">mean =</span> <span class="dv">0</span>, <span class="dt">sd =</span> <span class="dv">1</span>)</a>
+<a class="sourceLine" id="cb42-7" title="7">X1 &lt;-<span class="st"> </span><span class="kw">rep</span>(<span class="kw">seq</span>(<span class="dv">1</span>,<span class="dv">10</span>),<span class="dv">10</span>)</a>
+<a class="sourceLine" id="cb42-8" title="8"></a>
+<a class="sourceLine" id="cb42-9" title="9">Y &lt;-<span class="st"> </span>B0 <span class="op">+</span><span class="st"> </span>B1 <span class="op">*</span><span class="st"> </span>X1 <span class="op">+</span><span class="st"> </span>e</a></code></pre></div>
 <p>Y is now a vector with length equal to the longest vector used in the calculation.</p>
 <p>Question: B0 and B1 are vectors of length 1.</p>
 <p>X1 and e are vectors of length 100.</p>
@@ -597,23 +604,23 @@ list-style-type: none;
 <div id="recycling" class="slide section level2">
 <h1>Recycling</h1>
 <p>R will “recycle” vectors until there are enough elements to perform an operation. Everything gets as “long” as the longest vector in the operation. For scalar operations on a vector this doesn’t involve any drama. Try the following code:</p>
-<div class="sourceCode" id="cb41"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb41-1" title="1">vector1 =<span class="st"> </span><span class="dv">1</span><span class="op">:</span><span class="dv">10</span></a>
-<a class="sourceLine" id="cb41-2" title="2">vector2 =<span class="st"> </span><span class="dv">1</span><span class="op">:</span><span class="dv">5</span></a>
-<a class="sourceLine" id="cb41-3" title="3">scalar =<span class="st"> </span><span class="dv">3</span></a>
-<a class="sourceLine" id="cb41-4" title="4"></a>
-<a class="sourceLine" id="cb41-5" title="5"><span class="kw">print</span>(vector1 <span class="op">+</span><span class="st"> </span>scalar)</a></code></pre></div>
+<div class="sourceCode" id="cb43"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb43-1" title="1">vector1 =<span class="st"> </span><span class="dv">1</span><span class="op">:</span><span class="dv">10</span></a>
+<a class="sourceLine" id="cb43-2" title="2">vector2 =<span class="st"> </span><span class="dv">1</span><span class="op">:</span><span class="dv">5</span></a>
+<a class="sourceLine" id="cb43-3" title="3">scalar =<span class="st"> </span><span class="dv">3</span></a>
+<a class="sourceLine" id="cb43-4" title="4"></a>
+<a class="sourceLine" id="cb43-5" title="5"><span class="kw">print</span>(vector1 <span class="op">+</span><span class="st"> </span>scalar)</a></code></pre></div>
 <pre><code>##  [1]  4  5  6  7  8  9 10 11 12 13</code></pre>
-<div class="sourceCode" id="cb43"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb43-1" title="1"><span class="kw">print</span>(vector2 <span class="op">+</span><span class="st"> </span>scalar)</a></code></pre></div>
+<div class="sourceCode" id="cb45"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb45-1" title="1"><span class="kw">print</span>(vector2 <span class="op">+</span><span class="st"> </span>scalar)</a></code></pre></div>
 <pre><code>## [1] 4 5 6 7 8</code></pre>
-<div class="sourceCode" id="cb45"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb45-1" title="1"><span class="kw">print</span>(vector1 <span class="op">+</span><span class="st"> </span>vector2)</a></code></pre></div>
+<div class="sourceCode" id="cb47"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb47-1" title="1"><span class="kw">print</span>(vector1 <span class="op">+</span><span class="st"> </span>vector2)</a></code></pre></div>
 <pre><code>##  [1]  2  4  6  8 10  7  9 11 13 15</code></pre>
 </div>
 <div id="set-theory---part-i" class="slide section level2">
 <h1>Set theory - Part I</h1>
 <p>The <code>%in%</code> operator will return a logical vector indicating whether or not an element of the first set is contained in the second set.</p>
-<div class="sourceCode" id="cb47"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb47-1" title="1">x &lt;-<span class="st"> </span><span class="dv">1</span><span class="op">:</span><span class="dv">10</span></a>
-<a class="sourceLine" id="cb47-2" title="2">y &lt;-<span class="st"> </span><span class="dv">5</span><span class="op">:</span><span class="dv">15</span></a>
-<a class="sourceLine" id="cb47-3" title="3">x <span class="op">%in%</span><span class="st"> </span>y</a></code></pre></div>
+<div class="sourceCode" id="cb49"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb49-1" title="1">x &lt;-<span class="st"> </span><span class="dv">1</span><span class="op">:</span><span class="dv">10</span></a>
+<a class="sourceLine" id="cb49-2" title="2">y &lt;-<span class="st"> </span><span class="dv">5</span><span class="op">:</span><span class="dv">15</span></a>
+<a class="sourceLine" id="cb49-3" title="3">x <span class="op">%in%</span><span class="st"> </span>y</a></code></pre></div>
 <pre><code>##  [1] FALSE FALSE FALSE FALSE  TRUE  TRUE  TRUE  TRUE  TRUE  TRUE</code></pre>
 </div>
 <div id="set-theory---part-ii" class="slide section level2">
@@ -625,27 +632,27 @@ list-style-type: none;
 <li><code>setequal</code></li>
 <li><code>is.element</code></li>
 </ul>
-<div class="sourceCode" id="cb49"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb49-1" title="1">?union</a></code></pre></div>
-<div class="sourceCode" id="cb50"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb50-1" title="1">x &lt;-<span class="st"> </span><span class="dv">1900</span><span class="op">:</span><span class="dv">1910</span></a>
-<a class="sourceLine" id="cb50-2" title="2">y &lt;-<span class="st"> </span><span class="dv">1905</span><span class="op">:</span><span class="dv">1915</span></a>
-<a class="sourceLine" id="cb50-3" title="3"><span class="kw">intersect</span>(x, y)</a></code></pre></div>
+<div class="sourceCode" id="cb51"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb51-1" title="1">?union</a></code></pre></div>
+<div class="sourceCode" id="cb52"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb52-1" title="1">x &lt;-<span class="st"> </span><span class="dv">1900</span><span class="op">:</span><span class="dv">1910</span></a>
+<a class="sourceLine" id="cb52-2" title="2">y &lt;-<span class="st"> </span><span class="dv">1905</span><span class="op">:</span><span class="dv">1915</span></a>
+<a class="sourceLine" id="cb52-3" title="3"><span class="kw">intersect</span>(x, y)</a></code></pre></div>
 <pre><code>## [1] 1905 1906 1907 1908 1909 1910</code></pre>
-<div class="sourceCode" id="cb52"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb52-1" title="1"><span class="kw">setdiff</span>(x, y)</a></code></pre></div>
+<div class="sourceCode" id="cb54"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb54-1" title="1"><span class="kw">setdiff</span>(x, y)</a></code></pre></div>
 <pre><code>## [1] 1900 1901 1902 1903 1904</code></pre>
-<div class="sourceCode" id="cb54"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb54-1" title="1"><span class="kw">setequal</span>(x, y)</a></code></pre></div>
+<div class="sourceCode" id="cb56"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb56-1" title="1"><span class="kw">setequal</span>(x, y)</a></code></pre></div>
 <pre><code>## [1] FALSE</code></pre>
-<div class="sourceCode" id="cb56"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb56-1" title="1"><span class="kw">is.element</span>(<span class="dv">1941</span>, y)</a></code></pre></div>
+<div class="sourceCode" id="cb58"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb58-1" title="1"><span class="kw">is.element</span>(<span class="dv">1941</span>, y)</a></code></pre></div>
 <pre><code>## [1] FALSE</code></pre>
 </div>
 <div id="summarization" class="slide section level2">
 <h1>Summarization</h1>
 <p>Loads of functions take vector input and return scalar output. Translation of a large sest of numbers into a few, informative values is one of the cornerstones of statistics.</p>
-<div class="sourceCode" id="cb58"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb58-1" title="1">x =<span class="st"> </span><span class="dv">1</span><span class="op">:</span><span class="dv">50</span></a>
-<a class="sourceLine" id="cb58-2" title="2"><span class="kw">sum</span>(x)</a>
-<a class="sourceLine" id="cb58-3" title="3"><span class="kw">mean</span>(x)</a>
-<a class="sourceLine" id="cb58-4" title="4"><span class="kw">max</span>(x)</a>
-<a class="sourceLine" id="cb58-5" title="5"><span class="kw">length</span>(x)</a>
-<a class="sourceLine" id="cb58-6" title="6"><span class="kw">var</span>(x)</a></code></pre></div>
+<div class="sourceCode" id="cb60"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb60-1" title="1">x =<span class="st"> </span><span class="dv">1</span><span class="op">:</span><span class="dv">50</span></a>
+<a class="sourceLine" id="cb60-2" title="2"><span class="kw">sum</span>(x)</a>
+<a class="sourceLine" id="cb60-3" title="3"><span class="kw">mean</span>(x)</a>
+<a class="sourceLine" id="cb60-4" title="4"><span class="kw">max</span>(x)</a>
+<a class="sourceLine" id="cb60-5" title="5"><span class="kw">length</span>(x)</a>
+<a class="sourceLine" id="cb60-6" title="6"><span class="kw">var</span>(x)</a></code></pre></div>
 </div>
 <div id="vectors" class="slide section level2">
 <h1>Vectors</h1>
@@ -657,13 +664,13 @@ list-style-type: none;
 <p>Create a vector of length 10, with years starting from 1980.</p>
 <p>Create a vector with values from 1972 to 2012 in increments of four (1972, 1976, 1980, etc.)</p>
 <p>Construct the following vectors (feel free to use the <code>VectorQuestion.R</code> script):</p>
-<div class="sourceCode" id="cb59"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb59-1" title="1">FirstName &lt;-<span class="st"> </span><span class="kw">c</span>(<span class="st">&quot;Richard&quot;</span>, <span class="st">&quot;James&quot;</span>, <span class="st">&quot;Ronald&quot;</span>, <span class="st">&quot;Ronald&quot;</span></a>
-<a class="sourceLine" id="cb59-2" title="2">              , <span class="st">&quot;George&quot;</span>, <span class="st">&quot;William&quot;</span>, <span class="st">&quot;William&quot;</span>, <span class="st">&quot;George&quot;</span></a>
-<a class="sourceLine" id="cb59-3" title="3">              , <span class="st">&quot;George&quot;</span>, <span class="st">&quot;Barack&quot;</span>, <span class="st">&quot;Barack&quot;</span>)</a>
-<a class="sourceLine" id="cb59-4" title="4">LastName &lt;-<span class="st"> </span><span class="kw">c</span>(<span class="st">&quot;Nixon&quot;</span>, <span class="st">&quot;Carter&quot;</span>, <span class="st">&quot;Reagan&quot;</span>, <span class="st">&quot;Reagan&quot;</span></a>
-<a class="sourceLine" id="cb59-5" title="5">              , <span class="st">&quot;Bush&quot;</span>, <span class="st">&quot;Clinton&quot;</span>, <span class="st">&quot;Clinton&quot;</span>, <span class="st">&quot;Bush&quot;</span></a>
-<a class="sourceLine" id="cb59-6" title="6">              , <span class="st">&quot;Bush&quot;</span>, <span class="st">&quot;Obama&quot;</span>, <span class="st">&quot;Obama&quot;</span>)</a>
-<a class="sourceLine" id="cb59-7" title="7">ElectionYear &lt;-<span class="st"> </span><span class="kw">seq</span>(<span class="dv">1972</span>, <span class="dv">2012</span>, <span class="dv">4</span>)</a></code></pre></div>
+<div class="sourceCode" id="cb61"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb61-1" title="1">FirstName &lt;-<span class="st"> </span><span class="kw">c</span>(<span class="st">&quot;Richard&quot;</span>, <span class="st">&quot;James&quot;</span>, <span class="st">&quot;Ronald&quot;</span>, <span class="st">&quot;Ronald&quot;</span></a>
+<a class="sourceLine" id="cb61-2" title="2">              , <span class="st">&quot;George&quot;</span>, <span class="st">&quot;William&quot;</span>, <span class="st">&quot;William&quot;</span>, <span class="st">&quot;George&quot;</span></a>
+<a class="sourceLine" id="cb61-3" title="3">              , <span class="st">&quot;George&quot;</span>, <span class="st">&quot;Barack&quot;</span>, <span class="st">&quot;Barack&quot;</span>)</a>
+<a class="sourceLine" id="cb61-4" title="4">LastName &lt;-<span class="st"> </span><span class="kw">c</span>(<span class="st">&quot;Nixon&quot;</span>, <span class="st">&quot;Carter&quot;</span>, <span class="st">&quot;Reagan&quot;</span>, <span class="st">&quot;Reagan&quot;</span></a>
+<a class="sourceLine" id="cb61-5" title="5">              , <span class="st">&quot;Bush&quot;</span>, <span class="st">&quot;Clinton&quot;</span>, <span class="st">&quot;Clinton&quot;</span>, <span class="st">&quot;Bush&quot;</span></a>
+<a class="sourceLine" id="cb61-6" title="6">              , <span class="st">&quot;Bush&quot;</span>, <span class="st">&quot;Obama&quot;</span>, <span class="st">&quot;Obama&quot;</span>)</a>
+<a class="sourceLine" id="cb61-7" title="7">ElectionYear &lt;-<span class="st"> </span><span class="kw">seq</span>(<span class="dv">1972</span>, <span class="dv">2012</span>, <span class="dv">4</span>)</a></code></pre></div>
 <ul>
 <li>List the last names in alphabetical order</li>
 <li>List the years in order by first name.</li>
@@ -674,19 +681,19 @@ list-style-type: none;
 </div>
 <div id="answer" class="slide section level2">
 <h1>Answer</h1>
-<div class="sourceCode" id="cb60"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb60-1" title="1">LastName[<span class="kw">order</span>(LastName)]</a></code></pre></div>
+<div class="sourceCode" id="cb62"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb62-1" title="1">LastName[<span class="kw">order</span>(LastName)]</a></code></pre></div>
 <pre><code>##  [1] &quot;Bush&quot;    &quot;Bush&quot;    &quot;Bush&quot;    &quot;Carter&quot;  &quot;Clinton&quot; &quot;Clinton&quot; &quot;Nixon&quot;  
 ##  [8] &quot;Obama&quot;   &quot;Obama&quot;   &quot;Reagan&quot;  &quot;Reagan&quot;</code></pre>
-<div class="sourceCode" id="cb62"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb62-1" title="1">ElectionYear[<span class="kw">order</span>(FirstName)]</a></code></pre></div>
+<div class="sourceCode" id="cb64"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb64-1" title="1">ElectionYear[<span class="kw">order</span>(FirstName)]</a></code></pre></div>
 <pre><code>##  [1] 2008 2012 1988 2000 2004 1976 1972 1980 1984 1992 1996</code></pre>
-<div class="sourceCode" id="cb64"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb64-1" title="1">ElectionYear[FirstName <span class="op">==</span><span class="st"> &#39;George&#39;</span>]</a></code></pre></div>
+<div class="sourceCode" id="cb66"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb66-1" title="1">ElectionYear[FirstName <span class="op">==</span><span class="st"> &#39;George&#39;</span>]</a></code></pre></div>
 <pre><code>## [1] 1988 2000 2004</code></pre>
-<div class="sourceCode" id="cb66"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb66-1" title="1">myLogical &lt;-<span class="st"> </span>(FirstName <span class="op">==</span><span class="st"> &#39;George&#39;</span>) <span class="op">&amp;</span><span class="st"> </span>(ElectionYear <span class="op">&lt;</span><span class="st"> </span><span class="dv">1996</span>)</a>
-<a class="sourceLine" id="cb66-2" title="2"><span class="kw">length</span>(<span class="kw">which</span>(myLogical))</a></code></pre></div>
+<div class="sourceCode" id="cb68"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb68-1" title="1">myLogical &lt;-<span class="st"> </span>(FirstName <span class="op">==</span><span class="st"> &#39;George&#39;</span>) <span class="op">&amp;</span><span class="st"> </span>(ElectionYear <span class="op">&lt;</span><span class="st"> </span><span class="dv">1996</span>)</a>
+<a class="sourceLine" id="cb68-2" title="2"><span class="kw">length</span>(<span class="kw">which</span>(myLogical))</a></code></pre></div>
 <pre><code>## [1] 1</code></pre>
-<div class="sourceCode" id="cb68"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb68-1" title="1"><span class="kw">sum</span>(myLogical)</a></code></pre></div>
+<div class="sourceCode" id="cb70"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb70-1" title="1"><span class="kw">sum</span>(myLogical)</a></code></pre></div>
 <pre><code>## [1] 1</code></pre>
-<div class="sourceCode" id="cb70"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb70-1" title="1"><span class="kw">sample</span>(LastName, <span class="dv">100</span>, <span class="dt">replace =</span> <span class="ot">TRUE</span>)</a></code></pre></div>
+<div class="sourceCode" id="cb72"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb72-1" title="1"><span class="kw">sample</span>(LastName, <span class="dv">100</span>, <span class="dt">replace =</span> <span class="ot">TRUE</span>)</a></code></pre></div>
 <pre><code>##   [1] &quot;Obama&quot;   &quot;Clinton&quot; &quot;Reagan&quot;  &quot;Bush&quot;    &quot;Reagan&quot;  &quot;Reagan&quot;  &quot;Bush&quot;   
 ##   [8] &quot;Bush&quot;    &quot;Reagan&quot;  &quot;Bush&quot;    &quot;Reagan&quot;  &quot;Reagan&quot;  &quot;Obama&quot;   &quot;Bush&quot;   
 ##  [15] &quot;Carter&quot;  &quot;Bush&quot;    &quot;Obama&quot;   &quot;Reagan&quot;  &quot;Reagan&quot;  &quot;Clinton&quot; &quot;Bush&quot;   
@@ -706,16 +713,16 @@ list-style-type: none;
 <div id="lists" class="slide section level2">
 <h1>Lists</h1>
 <p>Lists have data of arbitrary complexity. Any type, any length. Note the new <code>[[ ]]</code> double bracket operator.</p>
-<div class="sourceCode" id="cb72"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb72-1" title="1">x &lt;-<span class="st"> </span><span class="kw">list</span>()</a>
-<a class="sourceLine" id="cb72-2" title="2"><span class="kw">typeof</span>(x)</a></code></pre></div>
+<div class="sourceCode" id="cb74"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb74-1" title="1">x &lt;-<span class="st"> </span><span class="kw">list</span>()</a>
+<a class="sourceLine" id="cb74-2" title="2"><span class="kw">typeof</span>(x)</a></code></pre></div>
 <pre><code>## [1] &quot;list&quot;</code></pre>
-<div class="sourceCode" id="cb74"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb74-1" title="1">x[[<span class="dv">1</span>]] &lt;-<span class="st"> </span><span class="kw">c</span>(<span class="st">&quot;Hello&quot;</span>, <span class="st">&quot;there&quot;</span>, <span class="st">&quot;this&quot;</span>, <span class="st">&quot;is&quot;</span>, <span class="st">&quot;a&quot;</span>, <span class="st">&quot;list&quot;</span>)</a>
-<a class="sourceLine" id="cb74-2" title="2">x[[<span class="dv">2</span>]] &lt;-<span class="st"> </span><span class="kw">c</span>(pi, <span class="kw">exp</span>(<span class="dv">1</span>))</a>
-<a class="sourceLine" id="cb74-3" title="3"><span class="kw">summary</span>(x)</a></code></pre></div>
+<div class="sourceCode" id="cb76"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb76-1" title="1">x[[<span class="dv">1</span>]] &lt;-<span class="st"> </span><span class="kw">c</span>(<span class="st">&quot;Hello&quot;</span>, <span class="st">&quot;there&quot;</span>, <span class="st">&quot;this&quot;</span>, <span class="st">&quot;is&quot;</span>, <span class="st">&quot;a&quot;</span>, <span class="st">&quot;list&quot;</span>)</a>
+<a class="sourceLine" id="cb76-2" title="2">x[[<span class="dv">2</span>]] &lt;-<span class="st"> </span><span class="kw">c</span>(pi, <span class="kw">exp</span>(<span class="dv">1</span>))</a>
+<a class="sourceLine" id="cb76-3" title="3"><span class="kw">summary</span>(x)</a></code></pre></div>
 <pre><code>##      Length Class  Mode     
 ## [1,] 6      -none- character
 ## [2,] 2      -none- numeric</code></pre>
-<div class="sourceCode" id="cb76"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb76-1" title="1"><span class="kw">str</span>(x)</a></code></pre></div>
+<div class="sourceCode" id="cb78"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb78-1" title="1"><span class="kw">str</span>(x)</a></code></pre></div>
 <pre><code>## List of 2
 ##  $ : chr [1:6] &quot;Hello&quot; &quot;there&quot; &quot;this&quot; &quot;is&quot; ...
 ##  $ : num [1:2] 3.14 2.72</code></pre>
@@ -733,32 +740,32 @@ list-style-type: none;
 <div id="recursive-storage" class="slide section level2">
 <h1>Recursive storage</h1>
 <p>Lists can contain other lists as elements.</p>
-<div class="sourceCode" id="cb78"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb78-1" title="1">y &lt;-<span class="st"> </span><span class="kw">list</span>()</a>
-<a class="sourceLine" id="cb78-2" title="2">y[[<span class="dv">1</span>]] &lt;-<span class="st"> &quot;Lou Reed&quot;</span></a>
-<a class="sourceLine" id="cb78-3" title="3">y[[<span class="dv">2</span>]] &lt;-<span class="st"> </span><span class="dv">45</span></a>
-<a class="sourceLine" id="cb78-4" title="4"></a>
-<a class="sourceLine" id="cb78-5" title="5">x[[<span class="dv">3</span>]] &lt;-<span class="st"> </span>y</a></code></pre></div>
+<div class="sourceCode" id="cb80"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb80-1" title="1">y &lt;-<span class="st"> </span><span class="kw">list</span>()</a>
+<a class="sourceLine" id="cb80-2" title="2">y[[<span class="dv">1</span>]] &lt;-<span class="st"> &quot;Lou Reed&quot;</span></a>
+<a class="sourceLine" id="cb80-3" title="3">y[[<span class="dv">2</span>]] &lt;-<span class="st"> </span><span class="dv">45</span></a>
+<a class="sourceLine" id="cb80-4" title="4"></a>
+<a class="sourceLine" id="cb80-5" title="5">x[[<span class="dv">3</span>]] &lt;-<span class="st"> </span>y</a></code></pre></div>
 </div>
 <div id="list-metadata" class="slide section level2">
 <h1>List metadata</h1>
 <p>Again, typically names. However, these become very important for lists. Names are handled with the special <code>$</code> operator. <code>$</code> permits access to a single element. (A single element of a list can be a vector!)</p>
-<div class="sourceCode" id="cb79"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb79-1" title="1">y[[<span class="dv">1</span>]] &lt;-<span class="st"> </span><span class="kw">c</span>(<span class="st">&quot;Lou Reed&quot;</span>, <span class="st">&quot;Patti Smith&quot;</span>)</a>
-<a class="sourceLine" id="cb79-2" title="2">y[[<span class="dv">2</span>]] &lt;-<span class="st"> </span><span class="kw">c</span>(<span class="dv">45</span>, <span class="dv">63</span>)</a>
-<a class="sourceLine" id="cb79-3" title="3"></a>
-<a class="sourceLine" id="cb79-4" title="4"><span class="kw">names</span>(y) &lt;-<span class="st"> </span><span class="kw">c</span>(<span class="st">&quot;Artist&quot;</span>, <span class="st">&quot;Age&quot;</span>)</a>
-<a class="sourceLine" id="cb79-5" title="5"></a>
-<a class="sourceLine" id="cb79-6" title="6">y<span class="op">$</span>Artist</a></code></pre></div>
+<div class="sourceCode" id="cb81"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb81-1" title="1">y[[<span class="dv">1</span>]] &lt;-<span class="st"> </span><span class="kw">c</span>(<span class="st">&quot;Lou Reed&quot;</span>, <span class="st">&quot;Patti Smith&quot;</span>)</a>
+<a class="sourceLine" id="cb81-2" title="2">y[[<span class="dv">2</span>]] &lt;-<span class="st"> </span><span class="kw">c</span>(<span class="dv">45</span>, <span class="dv">63</span>)</a>
+<a class="sourceLine" id="cb81-3" title="3"></a>
+<a class="sourceLine" id="cb81-4" title="4"><span class="kw">names</span>(y) &lt;-<span class="st"> </span><span class="kw">c</span>(<span class="st">&quot;Artist&quot;</span>, <span class="st">&quot;Age&quot;</span>)</a>
+<a class="sourceLine" id="cb81-5" title="5"></a>
+<a class="sourceLine" id="cb81-6" title="6">y<span class="op">$</span>Artist</a></code></pre></div>
 <pre><code>## [1] &quot;Lou Reed&quot;    &quot;Patti Smith&quot;</code></pre>
-<div class="sourceCode" id="cb81"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb81-1" title="1">y<span class="op">$</span>Age</a></code></pre></div>
+<div class="sourceCode" id="cb83"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb83-1" title="1">y<span class="op">$</span>Age</a></code></pre></div>
 <pre><code>## [1] 45 63</code></pre>
 </div>
 <div id="lapply" class="slide section level2">
 <h1><code>lapply</code></h1>
 <p><code>lapply</code> is one of many functions which may be applied to lists. Can be difficult at first, but very powerful. Applies the same function to each element of a list.</p>
-<div class="sourceCode" id="cb83"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb83-1" title="1">myList &lt;-<span class="st"> </span><span class="kw">list</span>(<span class="dt">firstVector =</span> <span class="kw">c</span>(<span class="dv">1</span><span class="op">:</span><span class="dv">10</span>)</a>
-<a class="sourceLine" id="cb83-2" title="2">               , <span class="dt">secondVector =</span> <span class="kw">c</span>(<span class="dv">89</span>, <span class="dv">56</span>, <span class="dv">84</span>, <span class="dv">298</span>, <span class="dv">56</span>)</a>
-<a class="sourceLine" id="cb83-3" title="3">               , <span class="dt">thirdVector =</span> <span class="kw">c</span>(<span class="dv">7</span>,<span class="dv">3</span>,<span class="dv">5</span>,<span class="dv">6</span>,<span class="dv">2</span>,<span class="dv">4</span>,<span class="dv">2</span>))</a>
-<a class="sourceLine" id="cb83-4" title="4"><span class="kw">lapply</span>(myList, mean)</a></code></pre></div>
+<div class="sourceCode" id="cb85"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb85-1" title="1">myList &lt;-<span class="st"> </span><span class="kw">list</span>(<span class="dt">firstVector =</span> <span class="kw">c</span>(<span class="dv">1</span><span class="op">:</span><span class="dv">10</span>)</a>
+<a class="sourceLine" id="cb85-2" title="2">               , <span class="dt">secondVector =</span> <span class="kw">c</span>(<span class="dv">89</span>, <span class="dv">56</span>, <span class="dv">84</span>, <span class="dv">298</span>, <span class="dv">56</span>)</a>
+<a class="sourceLine" id="cb85-3" title="3">               , <span class="dt">thirdVector =</span> <span class="kw">c</span>(<span class="dv">7</span>,<span class="dv">3</span>,<span class="dv">5</span>,<span class="dv">6</span>,<span class="dv">2</span>,<span class="dv">4</span>,<span class="dv">2</span>))</a>
+<a class="sourceLine" id="cb85-4" title="4"><span class="kw">lapply</span>(myList, mean)</a></code></pre></div>
 <pre><code>## $firstVector
 ## [1] 5.5
 ## 
@@ -767,7 +774,7 @@ list-style-type: none;
 ## 
 ## $thirdVector
 ## [1] 4.142857</code></pre>
-<div class="sourceCode" id="cb85"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb85-1" title="1"><span class="kw">lapply</span>(myList, median)</a></code></pre></div>
+<div class="sourceCode" id="cb87"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb87-1" title="1"><span class="kw">lapply</span>(myList, median)</a></code></pre></div>
 <pre><code>## $firstVector
 ## [1] 5.5
 ## 
@@ -776,7 +783,7 @@ list-style-type: none;
 ## 
 ## $thirdVector
 ## [1] 4</code></pre>
-<div class="sourceCode" id="cb87"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb87-1" title="1"><span class="kw">lapply</span>(myList, sum)</a></code></pre></div>
+<div class="sourceCode" id="cb89"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb89-1" title="1"><span class="kw">lapply</span>(myList, sum)</a></code></pre></div>
 <pre><code>## $firstVector
 ## [1] 55
 ## 
@@ -807,10 +814,10 @@ list-style-type: none;
 </div>
 <div id="answers" class="slide section level2">
 <h1>Answers</h1>
-<div class="sourceCode" id="cb89"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb89-1" title="1">myList &lt;-<span class="st"> </span><span class="kw">list</span>()</a>
-<a class="sourceLine" id="cb89-2" title="2">myList<span class="op">$</span>Claims &lt;-<span class="st"> </span><span class="kw">rlnorm</span>(<span class="dv">100</span>, <span class="kw">log</span>(<span class="dv">10000</span>))</a>
-<a class="sourceLine" id="cb89-3" title="3">myList<span class="op">$</span>AccidentDate &lt;-<span class="st"> </span><span class="kw">sample</span>(<span class="kw">seq.Date</span>(<span class="kw">as.Date</span>(<span class="st">&#39;2000-01-01&#39;</span>), <span class="kw">as.Date</span>(<span class="st">&#39;2009-12-31&#39;</span>), <span class="dt">length.out =</span> <span class="dv">1000</span>), <span class="dv">100</span>)</a>
-<a class="sourceLine" id="cb89-4" title="4"><span class="kw">mean</span>(myList<span class="op">$</span>Claims)</a></code></pre></div>
+<div class="sourceCode" id="cb91"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb91-1" title="1">myList &lt;-<span class="st"> </span><span class="kw">list</span>()</a>
+<a class="sourceLine" id="cb91-2" title="2">myList<span class="op">$</span>Claims &lt;-<span class="st"> </span><span class="kw">rlnorm</span>(<span class="dv">100</span>, <span class="kw">log</span>(<span class="dv">10000</span>))</a>
+<a class="sourceLine" id="cb91-3" title="3">myList<span class="op">$</span>AccidentDate &lt;-<span class="st"> </span><span class="kw">sample</span>(<span class="kw">seq.Date</span>(<span class="kw">as.Date</span>(<span class="st">&#39;2000-01-01&#39;</span>), <span class="kw">as.Date</span>(<span class="st">&#39;2009-12-31&#39;</span>), <span class="dt">length.out =</span> <span class="dv">1000</span>), <span class="dv">100</span>)</a>
+<a class="sourceLine" id="cb91-4" title="4"><span class="kw">mean</span>(myList<span class="op">$</span>Claims)</a></code></pre></div>
 <pre><code>## [1] 20025.44</code></pre>
 </div>
 
