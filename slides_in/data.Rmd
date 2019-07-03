@@ -54,7 +54,7 @@ as.integer(z)
 
 ## Class
 
-A class is an extension of the basic data types. We'll see many examples of these. The class of a basic type will be equal to its type apart from 'double', whose class is 'numeric' for reasons I don't pretend to understand.
+A class is an extension of the basic data types. We'll see many examples of these. The class of a basic type will be equal to its type apart from 'double', whose class is 'numeric' (there is no single precision).
 
 ```{r }
 class(TRUE)
@@ -74,7 +74,7 @@ There is also a function called 'mode' which looks tempting. Ignore it.
 
 Dates in R can be tricky. Two basic classes: `Date` and `POSIXt`. The `Date` class does not get more granular than days. The `POSIXt` class can handle seconds, milliseconds, etc.
 
-My recommendation is to stick with the "Date" class. Introducing times means introducing time zones and possibility for confusion or error. Actuaries rarely need to measure things in minutes.
+If possible, stick with the "Date" class. Introducing times means introducing time zones and possibility for confusion or error. Actuaries rarely need to measure things in minutes.
 
 ```{r }
 x <- as.Date('2010-01-01')
@@ -96,7 +96,7 @@ But this is just fine:
 x <- as.Date('30-06-2010')
 ```
 
-If you want to preserve your sanity, stick with year, month, day.
+Best practice is to stick with year, month, day.
 ```{r }
 x <- as.Date('2010-06-30')
 ```
@@ -106,8 +106,14 @@ x <- as.Date('2010-06-30')
 To get the date and time of the computer, use the either `Sys.Date()` or `Sys.time()`. Note that `Sys.time()` will return both the day AND the time as a POSIXct object.
 
 ```{r }
+library(lubridate)
+
 x <- Sys.Date()
 y <- Sys.time()
+
+print(x)
+# use lubridate to increment - see next slide...
+print(ymd(x) + years(1))
 ```
 
 ## More reading on dates
@@ -118,14 +124,13 @@ The `lubridate` package has some nice convenience functions for setting month an
 
 `mondate` was written by an actuary and supports (among other things) handling time periods in terms of months.
 
-* [Date class](https://stat.ethz.ch/R-manual/R-devel/library/base/html/Dates.html)
-* [lubridate](http://www.jstatsoft.org/v40/i03/paper)
-* [Ripley and Hornik](http://www.r-project.org/doc/Rnews/Rnews_2001-2.pdf)
-* [mondate](https://code.google.com/p/mondate/)
+* Date class: https://stat.ethz.ch/R-manual/R-devel/library/base/html/Dates.html
+* lubridate: http://www.jstatsoft.org/v40/i03/paper
+* mondate: https://code.google.com/p/mondate/
 
 ## Factors
 
-Another gotcha. Factors were necessary many years ago when data collection and storage were expensive. A factor is a mapping of a character string to an integer. Particularly when importing data, R often wants to convert character values into a factor. You will often want to convert a factor into a string.
+Factors were necessary many years ago when data collection and storage were expensive. A factor is a mapping of a character string to an integer. Particularly when importing data, R often wants to convert character values into a factor. You will often want to convert a factor into a string.
 
 ```{r }
 myColors <- c("Red", "Blue", "Green", "Red", "Blue", "Red")
@@ -157,7 +162,11 @@ Now that you know what they are, you can spend the next few months avoiding fact
 
 If characters aren't behaving the way you expect them to, check the variables with `is.factor`. Convert them with `as.character` and you'll be back on the road to happiness.
 
-## Questions
+## Side note:
+
+The read.csv function in base R will import strings as factors.  To override, set stringsAsFactors = FALSE.
+
+## Exercises
 
 * Create a logical, integer, double and character variable.
 * Can you create a vector with both logical and character values?
@@ -182,7 +191,7 @@ A matrix is a vector with higher dimensions.
 
 A list has both higher dimensions, but also different data types.
 
-## A matrix
+## Matrixes
 
 Two ways to construct:
 
@@ -203,22 +212,18 @@ identical(myMatrix, myOtherMatrix)
 
 ```{r }
 myMatrix <- matrix(nrow=10, ncol=10)
-```
 
-```{r echo=FALSE}
-library(rblocks)
-block_grid(10, 10, type="matrix")
+print(myMatrix[1:3,])
 ```
 
 ## 
 
 ```{r }
 dim(myMatrix) <- c(25, 4)
+
+print(myMatrix[1:3,])
 ```
 
-```{r echo=FALSE}
-block_grid(25, 4, type="matrix")
-```
 
 ## Matrix metadata
 
@@ -259,6 +264,17 @@ rowSums(myMatrix)
 colMeans(myMatrix)
 ```
 
+## More than just summation: `apply` any function
+
+```{r }
+myMatrix <- myMatrix / 4
+print(myMatrix[1:3,])
+
+# row variance
+apply(myMatrix, 1, FUN=var)
+```
+
+
 ## More than two dimensions
 
 Like more than two dimensions? Shine on you crazy diamond.
@@ -277,10 +293,6 @@ str(x)
 ```
 
 ## Lists
-
-```{r echo=FALSE}
-make_block(x)
-```
 
 ## [ vs. [[
 
@@ -304,9 +316,6 @@ y[[2]] <- 45
 x[[3]] <- y
 ```
 
-```{r echo=FALSE}
-make_block(x)
-```
 
 ## List metadata
 
@@ -324,7 +333,7 @@ y$Age
 
 ## `lapply`
 
-`lapply` is one of many functions which may be applied to lists. Can be difficult at first, but very powerful. Applies the same function to each element of a list
+`lapply` is one of many functions which may be applied to lists. Can be difficult at first, but very powerful. Applies the same function to each element of a list (any vectorized function, including your creations)
 
 ```{r }
 myList <- list(firstVector = c(1:10)
@@ -339,10 +348,23 @@ lapply(myList, sum)
 
 Because lists are arbitrary, we can't expect functions like `sum` or `mean` to work. Use `lapply` to summarize particular list elements.
 
-## Questions
+## Exercise
 
 * Create a list with two elements. Have the first element be a vector with 100 numbers. Have the second element be a vector with 100 dates. Give your list the names: "Claim" and "Accident Date".
 * What is the average value of the first list element?
+
+## Solution
+
+```{r }
+dateVec = Sys.Date() + 1:100
+myList <- list(Claim = c(1:100)
+               , AccidentDate = dateVec)
+
+print(mean(myList[[1]]))
+print(mean(myList$Claim))
+
+```
+
 
 ## Data frames 
 
@@ -367,11 +389,11 @@ A data frame is a `list` of `vectors`. Each `vector` may have a different data t
 ```{r }
 set.seed(1234)
 State = rep(c("TX", "NY", "CA"), 10)
-EarnedPremium = rlnorm(length(State), meanlog = log(50000), sdlog=1)
-EarnedPremium = round(EarnedPremium, -3)
-Losses = EarnedPremium * runif(length(EarnedPremium), min=0.4, max = 0.9)
+EarnedPremium <- rlnorm(length(State), meanlog = log(50000), sdlog=1)
+EarnedPremium <- round(EarnedPremium, -3)
+Losses <- EarnedPremium * runif(length(EarnedPremium), min=0.4, max = 0.9)
 
-df = data.frame(State, EarnedPremium, Losses, stringsAsFactors=FALSE)
+df <- data.frame(State, EarnedPremium, Losses, stringsAsFactors=FALSE)
 ```
 
 ## Basic properties of a data frame
@@ -463,7 +485,7 @@ Merging is VLOOKUP on steroids. Basically equivalent to a JOIN in SQL.
 ## Altering column names
 
 ```{r }
-df$LossRation = with(df, Losses / EarnedPremium)
+df$LossRatio = with(df, Losses / EarnedPremium)
 names(df)
 colnames(df)[4] = "Loss Ratio"
 colnames(df)
@@ -490,9 +512,6 @@ whichEP = df$EarnedPremium >= 50000
 dfBigPolicies = df[whichEP, ]
 ```
 
-## Subsetting
-I use each of these three methods routinely. They're all good.
-
 ## Summarizing
 ```{r }
 sum(df$EarnedPremium)
@@ -515,7 +534,7 @@ dotchart(dfByState$EarnedPremium, dfByState$State, pch=19)
 
 ## Advanced data frame tools
   
-* dplyr
+* **dplyr**
 * tidyr
 * reshape2
 * data.table
@@ -533,6 +552,7 @@ myData = read.csv("SomeFile.csv")
 ## Reading from Excel
 
 Actually there are several ways:
+* readxl (part of the tidyverse)
 * XLConnect
 * xlsx
 * Excelsi-r
@@ -576,12 +596,26 @@ df = read.csv("../data/StateData.csv")
 View(df)
 ```
 
-## Questions
+## Exercise
 
-* Load the data from "StateData.csv" into a data frame.
-* Which state has the most premium?
+* Load the data from "states.csv" into a data frame.
+* Which state has the most claims in 2010?
 
-## Answer
+## Solution
 
 ```{r }
+df = read.csv("states.csv", stringsAsFactors=FALSE)
+# order by decreasing premium then take first
+df_filt <- df[df$PolicyYear == 2010, c("State", "NumClaims")]
+df_ordered <- df_filt[order(df_filt$NumClaims, decreasing=TRUE),]
+print(df_ordered[1,]$State)
+print(df_ordered[1:10,])
+
+
+
+# OR, get max premium and then filter on that
+df_filt <- df[df$PolicyYear == 2010, c("State", "NumClaims")]
+maxClaims <- max(df_filt$NumClaims)
+print(df_filt[df_filt$NumClaims==maxClaims,]$State)
+
 ```
