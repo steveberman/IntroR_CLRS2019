@@ -220,10 +220,10 @@ plt + labs(x = 'Policy year', y = '# of claims')
 
 ## Gridlines, legends, axis ticks
 
-TODO: complete this section
-
 ```{r}
-
+plt + aes(color="Region") + labs(x = 'Policy year', y = '# of claims', color = "Region") +
+   theme(panel.grid.major = element_line(colour = "black")) +
+   theme(axis.text = element_text(colour = "blue"))
 ```
 
 
@@ -231,6 +231,8 @@ TODO: complete this section
 ## Stuff you can do with ggplot:
 
 Line chart, bar chart, boxplot, scatterplots, dumbbell plot, violin plot, heatmaps, trellis plots, slopecharts, more!
+
+# Exercises
 
 ## Exercises
 
@@ -243,20 +245,30 @@ Extra credit:
 
 Use the state data to create a time series number of claims. Facet by region.
 
-## Answers:
+## Solutions (1):
 
 ```{r}
 library(raw)
 data("RegionExperience")
 plt1 <- ggplot(RegionExperience, aes(x = PolicyYear, y = NumClaims)) + geom_point()
 plt1
+```
 
+## Solutions (2):
+
+```{r}
 plt2 <- plt1 + aes(color=Region)
 plt2
+```
 
+## Solutions (3):
+```{r}
 plt3 <- plt2 + stat_smooth(method = "lm")
 plt3
+```
 
+## Solutions (4):
+```{r}
 RegionExperience$Frequency <- with(RegionExperience, NumClaims / NumPolicies)
 
 plt4 <- ggplot(RegionExperience, aes(x=PolicyYear, y=Frequency, color=Region)) + geom_point()+ 
@@ -264,7 +276,8 @@ plt4 <- ggplot(RegionExperience, aes(x=PolicyYear, y=Frequency, color=Region)) +
 plt4
 ```
 
-```{r} -->
+## Solutions (EC):
+```{r}
 data("StateExperience")
 pltExtra <- ggplot(StateExperience, aes(x=PolicyYear, y=NumClaims, color=Postal)) +
    geom_point() + geom_line()
