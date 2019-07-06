@@ -1,0 +1,368 @@
+---
+title: "Loss Distributions"
+output:
+  revealjs::revealjs_presentation:
+    center: no
+    css: ../css/revealOpts.css
+    reveal_plugins:
+    - notes
+    - zoom
+    self_contained: false
+    theme: solarized
+    transition: slide
+---
+
+```{r include=FALSE}
+source('common.R')
+```
+
+# Overview
+
+## What we'll do 
+
+* Generate some data
+* Visualize it
+* Explore the log likelihood
+* Fit distributions
+* Goodness of fit
+
+<!-- ## Packages we'll use -->
+
+<!-- * `MASS` (MASS = Modern Applied Statistics in S) -->
+<!--     * `fitdistr` will fit a distribution to a loss distribution function -->
+<!-- * `actuar` -->
+<!--     * `emm` calculates empirical moments -->
+<!--     * `lev` limited expected value -->
+<!--     * `coverage` modifies a loss distribution for coverage elements -->
+<!--     * Contains many more distributions than are found in `base` R such as Burr, Pareto, etc. Basically, anything in "Loss Models" is likely to be found here. -->
+<!--     * Contains the dental claims data from "Loss Models" -->
+
+## Generate some loss data
+
+```{r }
+set.seed(8910)
+sims <- 5e3
+
+scale <- 250
+shape <- 8
+severity <- rgamma(sims, shape, scale = scale)
+
+summary(severity)
+```
+
+## Visualize it
+
+```{r}
+data.frame(x = severity) %>% 
+  ggplot(aes(x)) + 
+  geom_histogram()
+```
+
+# Explore the likelihood function
+
+## Create the function
+
+$$\alpha=shape$$
+
+$$\beta = scale$$
+
+$$L(\alpha,\beta)=(\alpha-1)\sum{log(x_i)}$$
+$$-(1/\beta)\sum{x_i}-n\alpha*log(\beta)-n*log(\Gamma(\alpha))$$
+
+```{r}
+log_like_gamma <- function(x, shape, scale) {
+  n <- length(x)
+  log_like <- sum(x) / scale + n * shape * log(scale) + n * log(gamma(shape))
+  log_like <- (shape - 1) * sum(log(x)) - log_like
+  log_like
+}
+```
+
+## Explore along the shape
+
+```{r}
+log_like_gamma(severity, c(0.5, 2), c(500, 1000))
+tbl_log_like <- data.frame(
+  shape = seq(0.05, 10, length.out = 500)
+)
+
+tbl_log_like <- tbl_log_like %>% 
+  mutate(
+      scale = mean(severity) / shape
+    , log_like = log_like_gamma(severity, shape, scale)
+  )
+```
+
+## Visualize
+
+```{r}
+tbl_log_like %>% 
+  ggplot(aes(shape, log_like)) + 
+  geom_line()
+```
+
+## Explore along the scale
+
+```{r}
+tbl_log_like <- data.frame(
+  scale = seq(0.5 * min(severity), max(severity), length.out = 500)
+)
+
+tbl_log_like <- tbl_log_like %>% 
+  mutate(
+      shape = mean(severity) / scale
+    , log_like = log_like_gamma(severity, shape, scale)
+  )
+```
+
+## Visualize
+
+```{r}
+tbl_log_like %>% 
+  ggplot(aes(scale, log_like)) + 
+  geom_line()
+```
+
+## Explore both
+
+```{r}
+tbl_log_like <- expand.grid(
+    scale = seq(0.5 * min(severity), max(severity), length.out = 250)
+  , shape = seq(0.05, 10, length.out = 250)
+) %>% 
+  mutate(
+    log_like = log_like_gamma(severity, shape, scale)
+  )
+```
+
+## Visualize
+
+```{r}
+tbl_log_like %>% 
+  ggplot(aes(scale, shape)) + 
+  geom_raster(aes(fill = log_like), interpolate = TRUE) +
+  scale_fill_continuous(low = 'red', high = 'green')
+```
+
+# `fitdistr`
+
+## A better way
+
+Directly examining the log-likelihood is instructive, but we don't do this in practice.
+
+## `fitdistr`
+
+```{r warning=FALSE}
+library(MASS)
+
+fitGamma <- fitdistr(severity, "gamma")
+fitLognormal <- fitdistr(severity, "lognormal")
+fitWeibull <- fitdistr(severity, "Weibull")
+
+fitGamma
+fitLognormal
+fitWeibull
+```
+
+## q-q plot
+
+```{r eval=FALSE}
+probabilities = seq_len(sims)/(sims + 1)
+
+weibullQ <- qweibull(probabilities, coef(fitWeibull)[1], coef(fitWeibull)[2])
+lnQ <- qlnorm(probabilities, coef(fitLognormal)[1], coef(fitLognormal)[2])
+gammaQ <- qgamma(probabilities, coef(fitGamma)[1], coef(fitGamma)[2])
+
+sampleLogMean <- fitLognormal$estimate[1]
+sampleLogSd <- fitLognormal$estimate[2]
+
+sampleShape <- fitGamma$estimate[1]
+sampleRate <- fitGamma$estimate[2]
+
+sampleShapeW <- fitWeibull$estimate[1]
+sampleScaleW <- fitWeibull$estimate[2]
+
+sortedSeverity <- sort(severity)
+oldPar <- par(mfrow = c(1,3))
+plot(sort(weibullQ), sortedSeverity, xlab = 'Theoretical Quantiles', ylab = 'Sample Quantiles', pch=19, main = "Weibull Fit")
+abline(0,1)
+
+plot(sort(lnQ), sortedSeverity, xlab = 'Theoretical Quantiles', ylab = 'Sample Quantiles', pch=19, main = "Lognormal Fit")
+abline(0,1)
+
+plot(sort(gammaQ), sortedSeverity, xlab = 'Theoretical Quantiles', ylab = 'Sample Quantiles', pch=19, main = "Gamma Fit")
+abline(0,1)
+
+par(oldPar)
+```
+
+## 
+
+```{r echo=FALSE}
+probabilities = seq_len(sims)/(sims + 1)
+
+weibullQ <- qweibull(probabilities, coef(fitWeibull)[1], coef(fitWeibull)[2])
+lnQ <- qlnorm(probabilities, coef(fitLognormal)[1], coef(fitLognormal)[2])
+gammaQ <- qgamma(probabilities, coef(fitGamma)[1], coef(fitGamma)[2])
+
+sampleLogMean <- fitLognormal$estimate[1]
+sampleLogSd <- fitLognormal$estimate[2]
+
+sampleShape <- fitGamma$estimate[1]
+sampleRate <- fitGamma$estimate[2]
+
+sampleShapeW <- fitWeibull$estimate[1]
+sampleScaleW <- fitWeibull$estimate[2]
+
+sortedSeverity <- sort(severity)
+oldPar <- par(mfrow = c(1,3))
+plot(sort(weibullQ), sortedSeverity, xlab = 'Theoretical Quantiles', ylab = 'Sample Quantiles', pch=19, main = "Weibull Fit")
+abline(0,1)
+
+plot(sort(lnQ), sortedSeverity, xlab = 'Theoretical Quantiles', ylab = 'Sample Quantiles', pch=19, main = "Lognormal Fit")
+abline(0,1)
+
+plot(sort(gammaQ), sortedSeverity, xlab = 'Theoretical Quantiles', ylab = 'Sample Quantiles', pch=19, main = "Gamma Fit")
+abline(0,1)
+
+par(oldPar)
+```
+
+## Compare fit to histogram
+
+```{r eval=FALSE}
+x <- seq(0, max(severity), length.out=500)
+yLN <- dlnorm(x, sampleLogMean, sampleLogSd)
+yGamma <- dgamma(x, sampleShape, sampleRate)
+yWeibull <- dweibull(x, sampleShapeW, sampleScaleW)
+
+hist(severity, freq=FALSE, ylim=range(yLN, yGamma))
+
+lines(x, yLN, col="blue")
+lines(x, yGamma, col="red")
+lines(x, yWeibull, col="green")
+```
+
+##
+
+```{r echo=FALSE}
+x <- seq(0, max(severity), length.out=500)
+yLN <- dlnorm(x, sampleLogMean, sampleLogSd)
+yGamma <- dgamma(x, sampleShape, sampleRate)
+yWeibull <- dweibull(x, sampleShapeW, sampleScaleW)
+
+hist(severity, freq=FALSE, ylim=range(yLN, yGamma))
+
+lines(x, yLN, col = "blue")
+lines(x, yGamma, col = "red")
+lines(x, yWeibull, col = "green")
+```
+
+## Kolmogorov-Smirnov
+
+The Kolmogorov-Smirnov test measures the distance between an sample distribution and a candidate loss distribution. More formal than q-q plots. 
+
+```{r eval=FALSE}
+sampleCumul <- seq(1, length(severity)) / length(severity)
+stepSample  <- stepfun(sortedSeverity, c(0, sampleCumul), f = 0)
+yGamma <- pgamma(sortedSeverity, sampleShape, sampleRate)
+yWeibull <- pweibull(sortedSeverity, sampleShapeW, sampleScaleW)
+yLN <- plnorm(sortedSeverity, sampleLogMean, sampleLogSd)
+
+plot(stepSample, col = "black", main = "K-S Gamma")
+lines(sortedSeverity, yGamma, col = "blue")
+
+plot(stepSample, col = "black", main = "K-S Weibull")
+lines(sortedSeverity, yWeibull, col = "blue")
+
+plot(stepSample, col = "black", main = "K-S Lognormal")
+lines(sortedSeverity, yLN, col = "blue")
+```
+
+## 
+
+```{r echo=FALSE}
+sampleCumul <- seq(1, length(severity)) / length(severity)
+stepSample  <- stepfun(sortedSeverity, c(0, sampleCumul), f = 0)
+yGamma <- pgamma(sortedSeverity, sampleShape, sampleRate)
+yWeibull <- pweibull(sortedSeverity, sampleShapeW, sampleScaleW)
+yLN <- plnorm(sortedSeverity, sampleLogMean, sampleLogSd)
+
+plot(stepSample, col = "black", main = "K-S Gamma")
+lines(sortedSeverity, yGamma, col = "blue")
+```
+
+## 
+
+```{r echo=FALSE}
+plot(stepSample, col = "black", main = "K-S Weibull")
+lines(sortedSeverity, yWeibull, col = "blue")
+```
+
+## 
+
+```{r echo = FALSE}
+plot(stepSample, col = "black", main = "K-S Lognormal")
+lines(sortedSeverity, yLN, col = "blue")
+```
+
+## More K-S
+
+A low value for D indicates that the selected curve is fairly close to our data. The p-value indicates the chance that D was produced by the null hypothesis.
+
+```{r }
+testGamma <- ks.test(severity, "pgamma", sampleShape, sampleRate)
+testLN <- ks.test(severity, "plnorm", sampleLogMean, sampleLogSd)
+testWeibull <- ks.test(severity, "pweibull", sampleShapeW, sampleScaleW)
+
+testGamma
+testLN
+testWeibull
+```
+
+# Your turn
+
+## Your turn
+
+* Simulate one thousand observations from a weibull distribution
+* Fit this against gamma and exponential distributions
+* Try that again with only 100 observations (tip: you don't need to generate the samples again. You can simply subset the vector you created in the first step.)
+
+<!-- # Direct optimization -->
+
+<!-- The `optim` function will optimize a function. Works very similar to the Solver algorithm in Excel. `optim` takes a function as an argument, so let's create a function. -->
+
+<!-- ```{r} -->
+<!-- quadraticFun <- function(a, b, c){ -->
+<!--   function(x) a*x^2 + b*x + c -->
+<!-- } -->
+
+<!-- myQuad <- quadraticFun(a=4, b=-3, c=3) -->
+<!-- plot(myQuad, -10, 10) -->
+<!-- ``` -->
+
+<!-- # Direct optimization -->
+
+<!-- 8 is our initial guess. A good initial guess will speed up conversion. -->
+
+<!-- ```{r } -->
+<!-- myResult <- optim(8, myQuad) -->
+<!-- myResult -->
+<!-- ``` -->
+
+<!-- ## Direct optimization -->
+<!-- Default is to minimize. Set the parameter `fnscale` to something negative to convert to a maximization problem. -->
+
+<!-- ```{r } -->
+<!-- myOtherQuad <- quadraticFun(-6, 20, -5) -->
+<!-- plot(myOtherQuad, -10, 10) -->
+<!-- myResult <- optim(8, myOtherQuad) -->
+<!-- myResult <- optim(8, myOtherQuad, control = list(fnscale=-1)) -->
+<!-- ``` -->
+
+<!-- # Direct optimization -->
+
+<!-- Direct optimization allows us to create another objective function to maximize, or work with loss distributions for which there isn't yet support in a package like `actuar`. May be used for general purpose optimization problems, e.g. maximize rate of return for various capital allocation methods. -->
+
+<!-- Note that optimization is a general, solved problem. Things like the simplex method already have package solutions in R. You don't need to reinvent the wheel! -->
+
