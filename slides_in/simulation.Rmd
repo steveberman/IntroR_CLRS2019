@@ -1,0 +1,311 @@
+---
+title: "Simulation"
+output:
+  revealjs::revealjs_presentation:
+    center: no
+    css: ../css/revealOpts.css
+    reveal_plugins:
+    - notes
+    - zoom
+    self_contained: false
+    theme: solarized
+    transition: slide
+---
+
+```{r include=FALSE}
+source('common.R')
+```
+
+# Distribution Functions
+
+## Probability distributions
+
+All probability distributions have four basic functions:
+
+* r[dist] - Random number generation
+* d[dist] - Density function
+* p[dist] - Cumulative distribution
+* q[dist] - Quantiles
+
+Where [dist] is some common distribution
+
+## Random simulation
+
+```{r}
+
+rnorm(10, 5, 10)  # random normals, mu and sigma set
+rlnorm(10)        # random lognormal
+rexp(10)
+rgamma(10, shape=2)
+```
+
+## Random simulation (cont.)
+
+```{r}
+dist_mean <- 10e3
+dist_cv <- 2.5
+dist_sd <- dist_mean * dist_cv
+
+sims <- 5e3
+norms <- rnorm(sims, dist_mean, dist_sd)
+
+norms %>% head()
+```
+
+## Histogram
+
+```{r}
+hist(norms)
+```
+
+## Store simulations in a data frame
+
+```{r }
+tbl_sims <- data.frame(
+    x_exp = rexp(sims, 1 / dist_mean)
+  , x_norm = rnorm(sims, dist_mean, dist_sd)
+)
+
+head(tbl_sims)
+```
+
+## Visualize histogram
+
+```{r}
+tbl_sims %>% 
+  ggplot(aes(x = x_norm)) +
+  geom_histogram()
+```
+
+## Visualize density
+
+```{r}
+tbl_sims %>% 
+  ggplot(aes(x_norm)) + 
+  geom_density()
+```
+
+## Visualize multiple densities
+
+```{r}
+# overlay of density plots
+tbl_sims %>% 
+  ggplot() + 
+  geom_density(aes(x_exp), alpha = 0.8, fill = 'red') + 
+  geom_density(aes(x_norm), alpha = 0.8, fill = 'blue')
+```
+
+# Density function
+
+## Density function
+
+```{r}
+plot_points <- 500
+x_lims <- dist_mean + c(-1, 1) * 3 * dist_sd
+tbl_plot <- data.frame(
+    x = seq(x_lims[1], x_lims[2], length.out = plot_points)
+  )
+tbl_plot$density_norm <- dnorm(tbl_plot$x, dist_mean, dist_sd)
+```
+
+## Visualize density
+
+```{r}
+tbl_plot %>% 
+  ggplot(aes(x, density_norm)) + 
+  geom_line()
+```
+
+## Cumulative Distribution
+
+```{r}
+tbl_plot$cdf_norm <- pnorm(tbl_plot$x, dist_mean, dist_sd)
+tbl_plot %>% 
+  ggplot(aes(x, cdf_norm)) + 
+  geom_line()
+```
+
+## Quantiles
+
+You're pricing treaty XOL and want to cede the top 1% per claim. Where is your attachment?
+
+```{r}
+tails <- c(0.95, 0.98, 0.99)
+qnorm(tails, dist_mean, dist_sd)
+```
+
+## Exercise
+
+Generate density and cdf plots for an exponential distribution
+
+## Solution
+
+```{r}
+
+# randomly generate from an exponential
+dist_mean <- 10e3
+dist_sd <- dist_mean
+
+sims <- 5e3
+exps <- rexp(sims, dist_mean)
+
+# create density plot
+plot_points <- 500
+x_lims <- dist_mean + c(-1, 1) * 3 * dist_sd
+tbl_plot <- data.frame(
+    x = seq(x_lims[1], x_lims[2], length.out = plot_points)
+  )
+tbl_plot$density_norm <- dnorm(tbl_plot$x, dist_mean, dist_sd)
+
+tbl_plot %>% 
+  ggplot(aes(x, density_norm)) + 
+  geom_line()
+
+
+# create cdf plot
+tbl_plot$cdf_exp <- pexp(tbl_plot$x, dist_mean, dist_sd)
+tbl_plot %>% 
+  ggplot(aes(x, cdf_exp)) + 
+  geom_line()
+```
+
+# Compound loss distribution
+
+## Compound loss distribution
+
+Claims are Poisson distributed, claim severity normal
+
+```{r }
+set.seed(1234)
+policy_years <- 2001:2010
+freq <- 1e3
+num_claims <- rpois(length(policy_years), freq)
+dist_means <- dist_mean * 1.05 ^ (policy_years - min(policy_years))
+
+severity <- mapply(rnorm, num_claims, dist_means, MoreArgs = list(sd = dist_sd))
+tbl_claim <- data.frame(
+    policy_year = rep(policy_years, num_claims)
+  , severity = unlist(severity))
+```
+
+## Visualization
+
+```{r}
+tbl_claim %>% 
+  ggplot(aes(severity)) + 
+  geom_density(alpha = 0.6)  # alpha is transparency
+```
+
+```{r}
+tbl_claim %>% 
+  ggplot(aes(severity, fill = as.factor(policy_year))) + 
+  geom_density(alpha = 0.6)
+```
+
+## Visualization
+
+```{r}
+tbl_claim %>% 
+  ggplot(aes(severity, fill = as.factor(policy_year))) + 
+  geom_density() + 
+  facet_wrap(~ policy_year)
+```
+
+## Visualization 
+
+```{r}
+tbl_claim %>% 
+  group_by(policy_year) %>% 
+  summarise(med = median(severity))
+```
+
+
+# Miscellany
+
+## `Random sampling
+
+Generate a random sample of any discrete set of values. 
+
+```{r }
+set.seed(1234)
+sample(1:100, 10)
+
+sample(1:100, 100, replace=F) # select all, randomize order
+```
+
+Use the `prob` argument to weight the probabilities.
+
+```{r }
+sample(1:3, prob = c(1, 1, 100), replace = TRUE)
+```
+
+```{r }
+set.seed(1234)
+letters[sample(length(letters))]
+```
+
+## Exercises
+
+* Draw a lognormal distribution with a mean of $10,000 and a CV of 30%
+* For that distribution, what is the probability of seeing a claim greater than $25,000?
+* Generate 100 and 1,000 observations from that distribution.
+* Draw a histogram for each sample.
+* What are the mean, standard deviation and CV of each sample?
+
+## Solutions
+
+```{r } 
+# lognormal distribution
+severity <- 10000 ; CV <- .3 
+# parameters of underlying normal
+sigma <- sqrt(log(1 + CV^2)) 
+mu <- log(severity) - sigma^2/2 
+plot(function(x) dlnorm(x), mu, sigma, ylab="LN f(x)") 
+``` 
+
+## Solutions (cont.)
+
+```{r }
+# find claims > 100K
+# via distribution
+print(plnorm(25000, mu, sigma))
+``` 
+
+## Solutions (cont.)
+
+```{r }
+# generate random samples
+# via random
+set.seed(1234) 
+claims <- rlnorm(100, mu, sigma) 
+claims2 <- rlnorm(1000, mu, sigma) 
+
+# draw histograms
+hist(claims, breaks=seq(1, 500000, length.out=40))
+``` 
+
+## Solutions (cont.)
+
+```{r }
+hist(claims2, breaks=seq(1, 500000, length.out=40)) 
+``` 
+
+## Solutions (cont.)
+
+```{r }
+# get stats - the cheating way
+library(psych)
+describe(claims)
+describe(claims2)
+
+# the manual way
+basicStats <- function(dist_sample) {
+  print(paste0("Mean", mean(dist_sample)))
+  print(paste0("StDev", sd(dist_sample)))
+  print(paste0("CV", cv(dist_sample)))
+}
+
+basicStats(claims)
+basicStats(claims2)
+
+```
