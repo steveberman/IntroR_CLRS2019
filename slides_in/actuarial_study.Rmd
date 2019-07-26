@@ -1,0 +1,99 @@
+---
+title: "Reserve Study"
+output:
+  slidy_presentation:
+    duration: 60
+---
+
+
+```{r setup, include=FALSE}
+# knitr::opts_knit$set(root.dir = '~/GitHub/IntroR_CLRS2019')
+```
+
+
+
+# Project Overview
+
+We will estimate reserves for an insurer's claims data set. We will also define functions to make our code reusable for another insurer. 
+
+* Part 1 - Load in claims data as data frame  
+* Part 2 - Generate triangles as matrices  
+* Part 3 - Generate some sample diagnostics  
+* Part 4 - Development method  
+* Part 5 - IELR method  
+* Part 6 - B-F method  
+* Part 7 - Make a list object storing results from parts 1-6 above  
+* Part 8 - Output exhibits in excel  
+* Part 9 - Run parts 1-7 on another insurer claims data set using defined functions
+
+
+# (1) Load in Claims Data
+
+```{r }
+claimsData <- read.csv("~/GitHub/IntroR_CLRS2019/slides_in/ppauto_pos_clean.csv",
+                       stringsAsFactors = FALSE)
+class(claimsData)
+summary(claimsData)
+```
+
+
+```{r}
+# GRCODE represents the code assigned to individual insurers by NAIC
+claimsData$GRCODE <- as.factor(claimsData$GRCODE)
+summary(claimsData$GRCODE)
+
+# Let's analyze insurer with GRCODE 43
+claimsData43 <- subset(claimsData, GRCODE == 43)
+```
+
+
+## The origin trick
+
+From the summary, you can see that the accident and transaction dates were read as integers. To convert it to date in R, we need to know the origin date which in Excel is December 30, 1899.
+
+```{r }
+# Convert columns to date
+claimsData43$AccidentDate <- as.Date(claimsData43$AccidentDate,
+                                     origin = "1899-12-30")
+claimsData43$TransactionDate <- as.Date(claimsData43$TransactionDate,
+                                        origin = "1899-12-30")
+summary(claimsData43[, c("AccidentDate", "TransactionDate")])
+```
+
+# (2) Create loss triangles
+
+Our loss triangles will be 10x10 matrices with 2 dimensions - accident year and development age (in months)
+
+```{r}
+# create triangle matrices
+accYears <- 1988:(1988+10-1)
+devAges <- 12*c(1:10)
+paidTri <- matrix(nrow = 10, ncol = 10,
+                  dimnames = list(accYears, devAges))
+incTri <- paidTri
+```
+
+```{r}
+# create columns for accident years and development ages
+library(lubridate)
+claimsData43$AccidentYear <- year(claimsData43$AccidentDate)
+claimsData43$DevAge <- 12*(year(claimsData43$TransactionDate)-
+                             year(claimsData43$AccidentDate)+1)
+
+# sort first by accident year and then by development age
+claimsData43 <- claimsData43[order(claimsData43$AccidentYear,
+                                   claimsData43$DevAge),]
+
+# create cumulative loss triangles
+for(i in 1:length(accYears)){
+  for(j in 1:(length(devAges)-i+1)){
+    paidTri[i,j] <- as.numeric(subset(claimsData43,
+                                     AccidentYear == accYears[i] & DevAge == devAges[j],
+                                     CumPaidLoss))
+    incTri[i,j] <- as.numeric(subset(claimsData43,
+                                     AccidentYear == accYears[i] & DevAge == devAges[j],
+                                     IncurLoss))
+  }
+}
+```
+

@@ -189,7 +189,7 @@ typeof(y)
 
 A matrix is a vector with higher dimensions.
 
-A list has both higher dimensions, but also different data types.
+A list has higher dimensions and different data types.
 
 ## Matrixes
 
@@ -291,8 +291,6 @@ x[[2]] <- c(pi, exp(1))
 summary(x)
 str(x)
 ```
-
-## Lists
 
 ## [ vs. [[
 
@@ -475,12 +473,14 @@ cbind(dfA, dfC)
 
 ## Merging
 
+Merging is VLOOKUP on steroids. Basically equivalent to a JOIN in SQL.
+
 ```{r size='tiny'}
+head(df, 2)
 dfRateChange = data.frame(State =c("TX", "CA", "NY"), RateChange = c(.05, -.1, .2))
 df = merge(df, dfRateChange)
+head(df, 2)
 ```
-
-Merging is VLOOKUP on steroids. Basically equivalent to a JOIN in SQL.
 
 ## Altering column names
 
