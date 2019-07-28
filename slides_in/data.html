@@ -530,10 +530,10 @@ list-style-type: none;
 <a class="sourceLine" id="cb34-2" title="2">y &lt;-<span class="st"> </span><span class="kw">Sys.time</span>()</a>
 <a class="sourceLine" id="cb34-3" title="3"></a>
 <a class="sourceLine" id="cb34-4" title="4"><span class="kw">print</span>(x)</a></code></pre></div>
-<pre><code>## [1] &quot;2019-07-03&quot;</code></pre>
+<pre><code>## [1] &quot;2019-07-28&quot;</code></pre>
 <div class="sourceCode" id="cb36"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb36-1" title="1"><span class="co"># use lubridate to increment - see next slide...</span></a>
 <a class="sourceLine" id="cb36-2" title="2"><span class="kw">print</span>(<span class="kw">ymd</span>(x) <span class="op">+</span><span class="st"> </span><span class="kw">years</span>(<span class="dv">1</span>))</a></code></pre></div>
-<pre><code>## [1] &quot;2020-07-03&quot;</code></pre>
+<pre><code>## [1] &quot;2020-07-28&quot;</code></pre>
 </div>
 <div id="more-reading-on-dates" class="slide section level2">
 <h1>More reading on dates</h1>
@@ -608,7 +608,7 @@ list-style-type: none;
 <div id="from-vectors-to-matrices-and-lists" class="slide section level2">
 <h1>From vectors to matrices and lists</h1>
 <p>A matrix is a vector with higher dimensions.</p>
-<p>A list has both higher dimensions, but also different data types.</p>
+<p>A list has higher dimensions and different data types.</p>
 </div>
 <div id="matrixes" class="slide section level2">
 <h1>Matrixes</h1>
@@ -626,8 +626,8 @@ list-style-type: none;
 <a class="sourceLine" id="cb55-7" title="7"><span class="kw">identical</span>(myMatrix, myOtherMatrix)</a></code></pre></div>
 <pre><code>## [1] TRUE</code></pre>
 </div>
-<div id="section" class="slide section level2">
-<h1></h1>
+<div id="matrixes-cont." class="slide section level2">
+<h1>Matrixes (cont.)</h1>
 <div class="sourceCode" id="cb57"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb57-1" title="1">myMatrix &lt;-<span class="st"> </span><span class="kw">matrix</span>(<span class="dt">nrow=</span><span class="dv">10</span>, <span class="dt">ncol=</span><span class="dv">10</span>)</a>
 <a class="sourceLine" id="cb57-2" title="2"></a>
 <a class="sourceLine" id="cb57-3" title="3"><span class="kw">print</span>(myMatrix[<span class="dv">1</span><span class="op">:</span><span class="dv">3</span>,])</a></code></pre></div>
@@ -636,8 +636,8 @@ list-style-type: none;
 ## [2,]   NA   NA   NA   NA   NA   NA   NA   NA   NA    NA
 ## [3,]   NA   NA   NA   NA   NA   NA   NA   NA   NA    NA</code></pre>
 </div>
-<div id="section-1" class="slide section level2">
-<h1></h1>
+<div id="matrixes-cont.-1" class="slide section level2">
+<h1>Matrixes (cont.)</h1>
 <div class="sourceCode" id="cb59"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb59-1" title="1"><span class="kw">dim</span>(myMatrix) &lt;-<span class="st"> </span><span class="kw">c</span>(<span class="dv">25</span>, <span class="dv">4</span>)</a>
 <a class="sourceLine" id="cb59-2" title="2"></a>
 <a class="sourceLine" id="cb59-3" title="3"><span class="kw">print</span>(myMatrix[<span class="dv">1</span><span class="op">:</span><span class="dv">3</span>,])</a></code></pre></div>
@@ -653,33 +653,33 @@ list-style-type: none;
 <a class="sourceLine" id="cb61-2" title="2"><span class="kw">colnames</span>(myMatrix) &lt;-<span class="st"> </span>letters[<span class="dv">1</span><span class="op">:</span><span class="dv">10</span>]</a>
 <a class="sourceLine" id="cb61-3" title="3"><span class="kw">head</span>(myMatrix, <span class="dv">3</span>)</a></code></pre></div>
 <pre><code>##       a  b  c  d  e  f  g  h  i  j
-## [1,] 88 58 68 97 23 44  9 50 82 61
-## [2,] 64 54 30 19 28  6 34 24 17 35
-## [3,] 20 69 31 81 42 41 87 60 45 74</code></pre>
+## [1,] 24 34 23 14 73 20 69 87 67 44
+## [2,] 82 25 66 55 39 56 48 94 45 63
+## [3,] 98  6 22  4 13 83  7 70 84 92</code></pre>
 <div class="sourceCode" id="cb63"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb63-1" title="1"><span class="kw">rownames</span>(myMatrix) &lt;-<span class="st"> </span><span class="kw">tail</span>(letters, <span class="dv">10</span>)</a>
 <a class="sourceLine" id="cb63-2" title="2"><span class="kw">head</span>(myMatrix, <span class="dv">3</span>)</a></code></pre></div>
 <pre><code>##    a  b  c  d  e  f  g  h  i  j
-## q 88 58 68 97 23 44  9 50 82 61
-## r 64 54 30 19 28  6 34 24 17 35
-## s 20 69 31 81 42 41 87 60 45 74</code></pre>
+## q 24 34 23 14 73 20 69 87 67 44
+## r 82 25 66 55 39 56 48 94 45 63
+## s 98  6 22  4 13 83  7 70 84 92</code></pre>
 </div>
 <div id="data-access-for-a-matrix" class="slide section level2">
 <h1>Data access for a matrix</h1>
 <p>Matrix access is similar to vector, but with additional dimensions. For two-dimensional matrices, the order is row first, then column.</p>
 <div class="sourceCode" id="cb65"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb65-1" title="1">myMatrix[<span class="dv">2</span>, ]</a></code></pre></div>
 <pre><code>##  a  b  c  d  e  f  g  h  i  j 
-## 64 54 30 19 28  6 34 24 17 35</code></pre>
+## 82 25 66 55 39 56 48 94 45 63</code></pre>
 <div class="sourceCode" id="cb67"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb67-1" title="1">myMatrix[, <span class="dv">2</span>]</a></code></pre></div>
 <pre><code>##  q  r  s  t  u  v  w  x  y  z 
-## 58 54 69 77 39 55 73 72 36 91</code></pre>
+## 34 25  6  3 40 64 46 60 29 53</code></pre>
 </div>
 <div id="data-access-continued" class="slide section level2">
 <h1>Data access continued</h1>
 <p>Single index will return values by indexing along only one dimension.</p>
 <div class="sourceCode" id="cb69"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb69-1" title="1">myMatrix[<span class="dv">2</span>]</a></code></pre></div>
-<pre><code>## [1] 64</code></pre>
+<pre><code>## [1] 82</code></pre>
 <div class="sourceCode" id="cb71"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb71-1" title="1">myMatrix[<span class="dv">22</span>]</a></code></pre></div>
-<pre><code>## [1] 30</code></pre>
+<pre><code>## [1] 66</code></pre>
 </div>
 <div id="matrix-summary" class="slide section level2">
 <h1>Matrix summary</h1>
@@ -687,28 +687,28 @@ list-style-type: none;
 <pre><code>## [1] 5050</code></pre>
 <div class="sourceCode" id="cb75"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb75-1" title="1"><span class="kw">colSums</span>(myMatrix)</a></code></pre></div>
 <pre><code>##   a   b   c   d   e   f   g   h   i   j 
-## 549 624 357 460 451 610 565 394 435 605</code></pre>
+## 573 360 484 335 531 542 456 621 509 639</code></pre>
 <div class="sourceCode" id="cb77"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb77-1" title="1"><span class="kw">rowSums</span>(myMatrix)</a></code></pre></div>
 <pre><code>##   q   r   s   t   u   v   w   x   y   z 
-## 580 311 550 605 452 695 419 483 355 600</code></pre>
+## 455 573 479 418 678 569 448 521 565 344</code></pre>
 <div class="sourceCode" id="cb79"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb79-1" title="1"><span class="kw">colMeans</span>(myMatrix)</a></code></pre></div>
 <pre><code>##    a    b    c    d    e    f    g    h    i    j 
-## 54.9 62.4 35.7 46.0 45.1 61.0 56.5 39.4 43.5 60.5</code></pre>
+## 57.3 36.0 48.4 33.5 53.1 54.2 45.6 62.1 50.9 63.9</code></pre>
 </div>
 <div id="more-than-just-summation-apply-any-function" class="slide section level2">
 <h1>More than just summation: <code>apply</code> any function</h1>
 <div class="sourceCode" id="cb81"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb81-1" title="1">myMatrix &lt;-<span class="st"> </span>myMatrix <span class="op">/</span><span class="st"> </span><span class="dv">4</span></a>
 <a class="sourceLine" id="cb81-2" title="2"><span class="kw">print</span>(myMatrix[<span class="dv">1</span><span class="op">:</span><span class="dv">3</span>,])</a></code></pre></div>
-<pre><code>##    a     b     c     d     e     f     g    h     i     j
-## q 22 14.50 17.00 24.25  5.75 11.00  2.25 12.5 20.50 15.25
-## r 16 13.50  7.50  4.75  7.00  1.50  8.50  6.0  4.25  8.75
-## s  5 17.25  7.75 20.25 10.50 10.25 21.75 15.0 11.25 18.50</code></pre>
+<pre><code>##      a    b     c     d     e     f     g     h     i     j
+## q  6.0 8.50  5.75  3.50 18.25  5.00 17.25 21.75 16.75 11.00
+## r 20.5 6.25 16.50 13.75  9.75 14.00 12.00 23.50 11.25 15.75
+## s 24.5 1.50  5.50  1.00  3.25 20.75  1.75 17.50 21.00 23.00</code></pre>
 <div class="sourceCode" id="cb83"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb83-1" title="1"><span class="co"># row variance</span></a>
 <a class="sourceLine" id="cb83-2" title="2"><span class="kw">apply</span>(myMatrix, <span class="dv">1</span>, <span class="dt">FUN=</span>var)</a></code></pre></div>
-<pre><code>##        q        r        s        t        u        v        w        x 
-## 48.55556 18.52014 31.58333 73.37847 39.38611 38.75347 78.71458 61.40347 
-##        y        z 
-## 49.61458 45.95833</code></pre>
+<pre><code>##         q         r         s         t         u         v         w 
+##  43.32292  25.61181 102.24236  65.67778  51.58056  64.07569  45.09444 
+##         x         y         z 
+##  23.54792  62.69792  37.55833</code></pre>
 </div>
 <div id="more-than-two-dimensions" class="slide section level2">
 <h1>More than two dimensions</h1>
@@ -731,18 +731,15 @@ list-style-type: none;
 ##  $ : chr [1:6] &quot;Hello&quot; &quot;there&quot; &quot;this&quot; &quot;is&quot; ...
 ##  $ : num [1:2] 3.14 2.72</code></pre>
 </div>
-<div id="lists-1" class="slide section level2">
-<h1>Lists</h1>
-</div>
-<div id="vs." class="slide section level2">
-<h1>[ vs. [[</h1>
+<div id="lists-vs." class="slide section level2">
+<h1>Lists: [ vs. [[</h1>
 <p><code>[</code> is (almost always) used to set and return an element of the same type as the <em>containing</em> object.</p>
 <p><code>[[</code> is used to set and return an element of the same type as the <em>contained</em> object.</p>
 <p>This is why we use <code>[[</code> to set an item in a list.</p>
 <p>Don’t worry if this doesn’t make sense yet. It’s difficult for most R programmers.</p>
 </div>
-<div id="section-2" class="slide section level2">
-<h1></h1>
+<div id="lists-cont." class="slide section level2">
+<h1>Lists (cont.)</h1>
 <p>Lists can contain other lists as elements.</p>
 <div class="sourceCode" id="cb91"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb91-1" title="1">y &lt;-<span class="st"> </span><span class="kw">list</span>()</a>
 <a class="sourceLine" id="cb91-2" title="2">y[[<span class="dv">1</span>]] &lt;-<span class="st"> &quot;Lou Reed&quot;</span></a>
@@ -752,7 +749,7 @@ list-style-type: none;
 </div>
 <div id="list-metadata" class="slide section level2">
 <h1>List metadata</h1>
-<p>Again, typically names. However, these become very important for lists. Names are handled with the special <code>$</code> operator. <code>$</code> permits access to a single element. (A single element of a list can be a vector!)</p>
+<p>Again, typically names. However, these become very important for lists. Names are handled with the special <code>$</code> operator. <code>$</code> permits access to a single element. (A single element of a list can be a vector, or in fact many more things)</p>
 <div class="sourceCode" id="cb92"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb92-1" title="1">y[[<span class="dv">1</span>]] &lt;-<span class="st"> </span><span class="kw">c</span>(<span class="st">&quot;Lou Reed&quot;</span>, <span class="st">&quot;Patti Smith&quot;</span>)</a>
 <a class="sourceLine" id="cb92-2" title="2">y[[<span class="dv">2</span>]] &lt;-<span class="st"> </span><span class="kw">c</span>(<span class="dv">45</span>, <span class="dv">63</span>)</a>
 <a class="sourceLine" id="cb92-3" title="3"></a>
@@ -810,7 +807,7 @@ list-style-type: none;
 </div>
 <div id="solution" class="slide section level2">
 <h1>Solution</h1>
-<div class="sourceCode" id="cb102"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb102-1" title="1">dateVec =<span class="st"> </span><span class="kw">Sys.Date</span>() <span class="op">+</span><span class="st"> </span><span class="dv">1</span><span class="op">:</span><span class="dv">100</span></a>
+<div class="sourceCode" id="cb102"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb102-1" title="1">dateVec &lt;-<span class="st"> </span><span class="kw">Sys.Date</span>() <span class="op">+</span><span class="st"> </span><span class="dv">1</span><span class="op">:</span><span class="dv">100</span></a>
 <a class="sourceLine" id="cb102-2" title="2">myList &lt;-<span class="st"> </span><span class="kw">list</span>(<span class="dt">Claim =</span> <span class="kw">c</span>(<span class="dv">1</span><span class="op">:</span><span class="dv">100</span>)</a>
 <a class="sourceLine" id="cb102-3" title="3">               , <span class="dt">AccidentDate =</span> dateVec)</a>
 <a class="sourceLine" id="cb102-4" title="4"></a>
@@ -840,7 +837,7 @@ list-style-type: none;
 <div id="creating-a-data-frame" class="slide section level2">
 <h1>Creating a data frame</h1>
 <div class="sourceCode" id="cb106"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb106-1" title="1"><span class="kw">set.seed</span>(<span class="dv">1234</span>)</a>
-<a class="sourceLine" id="cb106-2" title="2">State =<span class="st"> </span><span class="kw">rep</span>(<span class="kw">c</span>(<span class="st">&quot;TX&quot;</span>, <span class="st">&quot;NY&quot;</span>, <span class="st">&quot;CA&quot;</span>), <span class="dv">10</span>)</a>
+<a class="sourceLine" id="cb106-2" title="2">State &lt;-<span class="st"> </span><span class="kw">rep</span>(<span class="kw">c</span>(<span class="st">&quot;TX&quot;</span>, <span class="st">&quot;NY&quot;</span>, <span class="st">&quot;CA&quot;</span>), <span class="dv">10</span>)</a>
 <a class="sourceLine" id="cb106-3" title="3">EarnedPremium &lt;-<span class="st"> </span><span class="kw">rlnorm</span>(<span class="kw">length</span>(State), <span class="dt">meanlog =</span> <span class="kw">log</span>(<span class="dv">50000</span>), <span class="dt">sdlog=</span><span class="dv">1</span>)</a>
 <a class="sourceLine" id="cb106-4" title="4">EarnedPremium &lt;-<span class="st"> </span><span class="kw">round</span>(EarnedPremium, <span class="dv">-3</span>)</a>
 <a class="sourceLine" id="cb106-5" title="5">Losses &lt;-<span class="st"> </span>EarnedPremium <span class="op">*</span><span class="st"> </span><span class="kw">runif</span>(<span class="kw">length</span>(EarnedPremium), <span class="dt">min=</span><span class="fl">0.4</span>, <span class="dt">max =</span> <span class="fl">0.9</span>)</a>
@@ -857,7 +854,7 @@ list-style-type: none;
 ##                     Mean   : 61500   Mean   : 39006  
 ##                     3rd Qu.: 63750   3rd Qu.: 41465  
 ##                     Max.   :560000   Max.   :411179</code></pre>
-<div class="sourceCode" id="cb109"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb109-1" title="1"><span class="kw">str</span>(df)</a></code></pre></div>
+<div class="sourceCode" id="cb109"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb109-1" title="1"><span class="kw">str</span>(df)   <span class="co"># str = structure</span></a></code></pre></div>
 <pre><code>## &#39;data.frame&#39;:    30 obs. of  3 variables:
 ##  $ State        : chr  &quot;TX&quot; &quot;NY&quot; &quot;CA&quot; &quot;TX&quot; ...
 ##  $ EarnedPremium: num  15000 66000 148000 5000 77000 83000 28000 29000 28000 21000 ...
@@ -924,67 +921,83 @@ list-style-type: none;
 <div class="sourceCode" id="cb131"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb131-1" title="1"><span class="kw">order</span>(df<span class="op">$</span>EarnedPremium)</a></code></pre></div>
 <pre><code>##  [1]  4 26  1 12 28 18 30 10 19 13 25  7  9  8 17 11 22 23 16 29 14 21  2
 ## [24]  5 24  6 27 15  3 20</code></pre>
-<div class="sourceCode" id="cb133"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb133-1" title="1">df =<span class="st"> </span>df[<span class="kw">order</span>(df<span class="op">$</span>EarnedPremium), ]</a></code></pre></div>
+<div class="sourceCode" id="cb133"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb133-1" title="1">df &lt;-<span class="st"> </span>df[<span class="kw">order</span>(df<span class="op">$</span>EarnedPremium), ]</a>
+<a class="sourceLine" id="cb133-2" title="2"><span class="kw">print</span>(<span class="kw">head</span>(df,<span class="dv">5</span>))</a></code></pre></div>
+<pre><code>##    State EarnedPremium    Losses
+## 4     TX          5000  2034.375
+## 26    NY         12000 10191.483
+## 1     TX         15000 12486.254
+## 12    CA         18000 15235.527
+## 28    TX         18000  9997.837</code></pre>
 </div>
 <div id="altering-and-adding-columns" class="slide section level2">
 <h1>Altering and adding columns</h1>
-<div class="sourceCode" id="cb134"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb134-1" title="1">df<span class="op">$</span>LossRatio =<span class="st"> </span>df<span class="op">$</span>EarnedPremium <span class="op">/</span><span class="st"> </span>df<span class="op">$</span>Losses</a>
-<a class="sourceLine" id="cb134-2" title="2">df<span class="op">$</span>LossRatio =<span class="st"> </span><span class="dv">1</span> <span class="op">/</span><span class="st"> </span>df<span class="op">$</span>LossRatio</a></code></pre></div>
+<div class="sourceCode" id="cb135"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb135-1" title="1">df<span class="op">$</span>LossRatio &lt;-<span class="st"> </span>df<span class="op">$</span>EarnedPremium <span class="op">/</span><span class="st"> </span>df<span class="op">$</span>Losses</a>
+<a class="sourceLine" id="cb135-2" title="2">df<span class="op">$</span>LossRatio &lt;-<span class="st"> </span><span class="dv">1</span> <span class="op">/</span><span class="st"> </span>df<span class="op">$</span>LossRatio</a></code></pre></div>
 </div>
 <div id="eliminating-columns" class="slide section level2">
 <h1>Eliminating columns</h1>
-<div class="sourceCode" id="cb135"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb135-1" title="1">df<span class="op">$</span>LossRatio =<span class="st"> </span><span class="ot">NULL</span></a>
-<a class="sourceLine" id="cb135-2" title="2">df =<span class="st"> </span>df[, <span class="dv">1</span><span class="op">:</span><span class="dv">2</span>]</a></code></pre></div>
+<div class="sourceCode" id="cb136"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb136-1" title="1">df<span class="op">$</span>LossRatio &lt;-<span class="st"> </span><span class="ot">NULL</span></a>
+<a class="sourceLine" id="cb136-2" title="2">df &lt;-<span class="st"> </span>df[, <span class="dv">1</span><span class="op">:</span><span class="dv">2</span>]</a></code></pre></div>
 </div>
 <div id="rbind-cbind" class="slide section level2">
 <h1>rbind, cbind</h1>
 <p><code>rbind</code> will append rows to the data frame. New rows must have the same number of columns and data types. <code>cbind</code> must have the same number of rows as the data frame.</p>
-<div class="sourceCode" id="cb136"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb136-1" title="1">dfA =<span class="st"> </span>df[<span class="dv">1</span><span class="op">:</span><span class="dv">10</span>,]</a>
-<a class="sourceLine" id="cb136-2" title="2">dfB =<span class="st"> </span>df[<span class="dv">11</span><span class="op">:</span><span class="dv">20</span>, ]</a>
-<a class="sourceLine" id="cb136-3" title="3"><span class="kw">rbind</span>(dfA, dfB)</a>
-<a class="sourceLine" id="cb136-4" title="4">dfC =<span class="st"> </span>dfA[, <span class="dv">1</span><span class="op">:</span><span class="dv">2</span>]</a>
-<a class="sourceLine" id="cb136-5" title="5"><span class="kw">cbind</span>(dfA, dfC)</a></code></pre></div>
+<div class="sourceCode" id="cb137"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb137-1" title="1">dfA &lt;-<span class="st"> </span>df[<span class="dv">1</span><span class="op">:</span><span class="dv">10</span>,]</a>
+<a class="sourceLine" id="cb137-2" title="2">dfB &lt;-<span class="st"> </span>df[<span class="dv">11</span><span class="op">:</span><span class="dv">20</span>, ]</a>
+<a class="sourceLine" id="cb137-3" title="3"><span class="kw">rbind</span>(dfA, dfB)</a>
+<a class="sourceLine" id="cb137-4" title="4">dfC &lt;-<span class="st"> </span>dfA[, <span class="dv">1</span><span class="op">:</span><span class="dv">2</span>]</a>
+<a class="sourceLine" id="cb137-5" title="5"><span class="kw">cbind</span>(dfA, dfC)</a></code></pre></div>
 </div>
 <div id="merging" class="slide section level2">
 <h1>Merging</h1>
-<div class="sourceCode" id="cb137"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb137-1" title="1">dfRateChange =<span class="st"> </span><span class="kw">data.frame</span>(<span class="dt">State =</span><span class="kw">c</span>(<span class="st">&quot;TX&quot;</span>, <span class="st">&quot;CA&quot;</span>, <span class="st">&quot;NY&quot;</span>), <span class="dt">RateChange =</span> <span class="kw">c</span>(.<span class="dv">05</span>, <span class="fl">-.1</span>, <span class="fl">.2</span>))</a>
-<a class="sourceLine" id="cb137-2" title="2">df =<span class="st"> </span><span class="kw">merge</span>(df, dfRateChange)</a></code></pre></div>
 <p>Merging is VLOOKUP on steroids. Basically equivalent to a JOIN in SQL.</p>
+<div class="sourceCode" id="cb138"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb138-1" title="1"><span class="kw">head</span>(df, <span class="dv">2</span>)</a></code></pre></div>
+<pre><code>##    State EarnedPremium
+## 4     TX          5000
+## 26    NY         12000</code></pre>
+<div class="sourceCode" id="cb140"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb140-1" title="1">dfRateChange &lt;-<span class="st"> </span><span class="kw">data.frame</span>(<span class="dt">State =</span><span class="kw">c</span>(<span class="st">&quot;TX&quot;</span>, <span class="st">&quot;CA&quot;</span>, <span class="st">&quot;NY&quot;</span>), <span class="dt">RateChange =</span> <span class="kw">c</span>(.<span class="dv">05</span>, <span class="fl">-.1</span>, <span class="fl">.2</span>))</a>
+<a class="sourceLine" id="cb140-2" title="2">df &lt;-<span class="st"> </span><span class="kw">merge</span>(df, dfRateChange)</a>
+<a class="sourceLine" id="cb140-3" title="3"><span class="kw">head</span>(df, <span class="dv">2</span>)</a></code></pre></div>
+<pre><code>##   State EarnedPremium RateChange
+## 1    CA         28000       -0.1
+## 2    CA         20000       -0.1</code></pre>
 </div>
 <div id="altering-column-names" class="slide section level2">
 <h1>Altering column names</h1>
-<div class="sourceCode" id="cb138"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb138-1" title="1">df<span class="op">$</span>LossRatio =<span class="st"> </span><span class="kw">with</span>(df, Losses <span class="op">/</span><span class="st"> </span>EarnedPremium)</a>
-<a class="sourceLine" id="cb138-2" title="2"><span class="kw">names</span>(df)</a></code></pre></div>
+<div class="sourceCode" id="cb142"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb142-1" title="1"><span class="co"># </span><span class="al">NOTE</span><span class="co">: with, attach, detach technically correct but many frown on it</span></a>
+<a class="sourceLine" id="cb142-2" title="2">df<span class="op">$</span>LossRatio &lt;-<span class="st"> </span><span class="kw">with</span>(df, Losses <span class="op">/</span><span class="st"> </span>EarnedPremium)</a>
+<a class="sourceLine" id="cb142-3" title="3"><span class="kw">names</span>(df)</a></code></pre></div>
 <pre><code>## [1] &quot;State&quot;         &quot;EarnedPremium&quot; &quot;RateChange&quot;    &quot;LossRatio&quot;</code></pre>
-<div class="sourceCode" id="cb140"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb140-1" title="1"><span class="kw">colnames</span>(df)[<span class="dv">4</span>] =<span class="st"> &quot;Loss Ratio&quot;</span></a>
-<a class="sourceLine" id="cb140-2" title="2"><span class="kw">colnames</span>(df)</a></code></pre></div>
+<div class="sourceCode" id="cb144"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb144-1" title="1"><span class="kw">colnames</span>(df)[<span class="dv">4</span>] =<span class="st"> &quot;Loss Ratio&quot;</span></a>
+<a class="sourceLine" id="cb144-2" title="2"><span class="kw">colnames</span>(df)</a></code></pre></div>
 <pre><code>## [1] &quot;State&quot;         &quot;EarnedPremium&quot; &quot;RateChange&quot;    &quot;Loss Ratio&quot;</code></pre>
 </div>
 <div id="subsetting---the-easy-way" class="slide section level2">
 <h1>Subsetting - The easy way</h1>
-<div class="sourceCode" id="cb142"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb142-1" title="1">dfTX =<span class="st"> </span><span class="kw">subset</span>(df, State <span class="op">==</span><span class="st"> &quot;TX&quot;</span>)</a>
-<a class="sourceLine" id="cb142-2" title="2">dfBigPolicies =<span class="st"> </span><span class="kw">subset</span>(df, EarnedPremium <span class="op">&gt;=</span><span class="st"> </span><span class="dv">50000</span>)</a></code></pre></div>
+<div class="sourceCode" id="cb146"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb146-1" title="1">dfTX &lt;-<span class="st"> </span><span class="kw">subset</span>(df, State <span class="op">==</span><span class="st"> &quot;TX&quot;</span>)</a>
+<a class="sourceLine" id="cb146-2" title="2">dfBigPolicies &lt;-<span class="st"> </span><span class="kw">subset</span>(df, EarnedPremium <span class="op">&gt;=</span><span class="st"> </span><span class="dv">50000</span>)</a></code></pre></div>
 </div>
 <div id="subsetting---the-hardish-way" class="slide section level2">
 <h1>Subsetting - The hard(ish) way</h1>
-<div class="sourceCode" id="cb143"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb143-1" title="1">dfTX =<span class="st"> </span>df[df<span class="op">$</span>State <span class="op">==</span><span class="st"> &quot;TX&quot;</span>, ]</a>
-<a class="sourceLine" id="cb143-2" title="2">dfBigPolicies =<span class="st"> </span>df[df<span class="op">$</span>EarnedPremium <span class="op">&gt;=</span><span class="st"> </span><span class="dv">50000</span>, ]</a></code></pre></div>
+<div class="sourceCode" id="cb147"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb147-1" title="1">dfTX &lt;-<span class="st"> </span>df[df<span class="op">$</span>State <span class="op">==</span><span class="st"> &quot;TX&quot;</span>, ]</a>
+<a class="sourceLine" id="cb147-2" title="2">dfBigPolicies &lt;-<span class="st"> </span>df[df<span class="op">$</span>EarnedPremium <span class="op">&gt;=</span><span class="st"> </span><span class="dv">50000</span>, ]</a></code></pre></div>
 </div>
 <div id="subsetting---yet-another-way" class="slide section level2">
 <h1>Subsetting - Yet another way</h1>
-<div class="sourceCode" id="cb144"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb144-1" title="1">whichState =<span class="st"> </span>df<span class="op">$</span>State <span class="op">==</span><span class="st"> &quot;TX&quot;</span></a>
-<a class="sourceLine" id="cb144-2" title="2">dfTX =<span class="st"> </span>df[whichState, ]</a>
-<a class="sourceLine" id="cb144-3" title="3"></a>
-<a class="sourceLine" id="cb144-4" title="4">whichEP =<span class="st"> </span>df<span class="op">$</span>EarnedPremium <span class="op">&gt;=</span><span class="st"> </span><span class="dv">50000</span></a>
-<a class="sourceLine" id="cb144-5" title="5">dfBigPolicies =<span class="st"> </span>df[whichEP, ]</a></code></pre></div>
+<div class="sourceCode" id="cb148"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb148-1" title="1">whichState &lt;-<span class="st"> </span>df<span class="op">$</span>State <span class="op">==</span><span class="st"> &quot;TX&quot;</span></a>
+<a class="sourceLine" id="cb148-2" title="2">dfTX &lt;-<span class="st"> </span>df[whichState, ]</a>
+<a class="sourceLine" id="cb148-3" title="3"></a>
+<a class="sourceLine" id="cb148-4" title="4">whichEP &lt;-<span class="st"> </span>df<span class="op">$</span>EarnedPremium <span class="op">&gt;=</span><span class="st"> </span><span class="dv">50000</span></a>
+<a class="sourceLine" id="cb148-5" title="5">dfBigPolicies &lt;-<span class="st"> </span>df[whichEP, ]</a></code></pre></div>
 </div>
 <div id="summarizing" class="slide section level2">
 <h1>Summarizing</h1>
-<div class="sourceCode" id="cb145"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb145-1" title="1"><span class="kw">sum</span>(df<span class="op">$</span>EarnedPremium)</a></code></pre></div>
+<div class="sourceCode" id="cb149"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb149-1" title="1"><span class="kw">sum</span>(df<span class="op">$</span>EarnedPremium)</a></code></pre></div>
 <pre><code>## [1] 1845000</code></pre>
-<div class="sourceCode" id="cb147"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb147-1" title="1"><span class="kw">sum</span>(df<span class="op">$</span>EarnedPremium[df<span class="op">$</span>State <span class="op">==</span><span class="st"> &quot;TX&quot;</span>])</a></code></pre></div>
+<div class="sourceCode" id="cb151"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb151-1" title="1"><span class="kw">sum</span>(df<span class="op">$</span>EarnedPremium[df<span class="op">$</span>State <span class="op">==</span><span class="st"> &quot;TX&quot;</span>])</a></code></pre></div>
 <pre><code>## [1] 233000</code></pre>
-<div class="sourceCode" id="cb149"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb149-1" title="1"><span class="kw">aggregate</span>(df[,<span class="op">-</span><span class="dv">1</span>], <span class="kw">list</span>(df<span class="op">$</span>State), sum)</a></code></pre></div>
+<div class="sourceCode" id="cb153"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb153-1" title="1"><span class="kw">aggregate</span>(df[,<span class="op">-</span><span class="dv">1</span>], <span class="kw">list</span>(df<span class="op">$</span>State), sum)</a></code></pre></div>
 <pre><code>##   Group.1 EarnedPremium RateChange Loss Ratio
 ## 1      CA        673000       -1.0   8.257125
 ## 2      NY        939000        2.0  11.755127
@@ -992,14 +1005,14 @@ list-style-type: none;
 </div>
 <div id="summarizing-visually---1" class="slide section level2">
 <h1>Summarizing visually - 1</h1>
-<div class="sourceCode" id="cb151"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb151-1" title="1">dfByState =<span class="st"> </span><span class="kw">aggregate</span>(df<span class="op">$</span>EarnedPremium, <span class="kw">list</span>(df<span class="op">$</span>State), sum)</a>
-<a class="sourceLine" id="cb151-2" title="2"><span class="kw">colnames</span>(dfByState) =<span class="st"> </span><span class="kw">c</span>(<span class="st">&quot;State&quot;</span>, <span class="st">&quot;EarnedPremium&quot;</span>)</a>
-<a class="sourceLine" id="cb151-3" title="3"><span class="kw">barplot</span>(dfByState<span class="op">$</span>EarnedPremium, <span class="dt">names.arg=</span>dfByState<span class="op">$</span>State, <span class="dt">col=</span><span class="st">&quot;blue&quot;</span>)</a></code></pre></div>
+<div class="sourceCode" id="cb155"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb155-1" title="1">dfByState &lt;-<span class="st"> </span><span class="kw">aggregate</span>(df<span class="op">$</span>EarnedPremium, <span class="kw">list</span>(df<span class="op">$</span>State), sum)</a>
+<a class="sourceLine" id="cb155-2" title="2"><span class="kw">colnames</span>(dfByState) &lt;-<span class="st"> </span><span class="kw">c</span>(<span class="st">&quot;State&quot;</span>, <span class="st">&quot;EarnedPremium&quot;</span>)</a>
+<a class="sourceLine" id="cb155-3" title="3"><span class="kw">barplot</span>(dfByState<span class="op">$</span>EarnedPremium, <span class="dt">names.arg=</span>dfByState<span class="op">$</span>State, <span class="dt">col=</span><span class="st">&quot;blue&quot;</span>)</a></code></pre></div>
 <p><img src="data:image/png;base64,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" width="768" /></p>
 </div>
 <div id="summarizing-visually---2" class="slide section level2">
 <h1>Summarizing visually - 2</h1>
-<div class="sourceCode" id="cb152"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb152-1" title="1"><span class="kw">dotchart</span>(dfByState<span class="op">$</span>EarnedPremium, dfByState<span class="op">$</span>State, <span class="dt">pch=</span><span class="dv">19</span>)</a></code></pre></div>
+<div class="sourceCode" id="cb156"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb156-1" title="1"><span class="kw">dotchart</span>(dfByState<span class="op">$</span>EarnedPremium, dfByState<span class="op">$</span>State, <span class="dt">pch=</span><span class="dv">19</span>)</a></code></pre></div>
 <p><img src="data:image/png;base64,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" width="768" /></p>
 </div>
 <div id="advanced-data-frame-tools" class="slide section level2">
@@ -1017,36 +1030,37 @@ list-style-type: none;
 </div>
 <div id="reading-data" class="slide section level2">
 <h1>Reading data</h1>
-<div class="sourceCode" id="cb153"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb153-1" title="1">myData =<span class="st"> </span><span class="kw">read.csv</span>(<span class="st">&quot;SomeFile.csv&quot;</span>)</a></code></pre></div>
+<div class="sourceCode" id="cb157"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb157-1" title="1">myData &lt;-<span class="st"> </span><span class="kw">read.csv</span>(<span class="st">&quot;SomeFile.csv&quot;</span>)</a></code></pre></div>
 </div>
 <div id="reading-from-excel" class="slide section level2">
 <h1>Reading from Excel</h1>
 <p>Actually there are several ways: * readxl (part of the tidyverse) * XLConnect * xlsx * Excelsi-r</p>
-<div class="sourceCode" id="cb154"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb154-1" title="1"><span class="kw">library</span>(XLConnect)</a>
-<a class="sourceLine" id="cb154-2" title="2">wbk =<span class="st"> </span><span class="kw">loadWorkbook</span>(<span class="st">&quot;myWorkbook.xlsx&quot;</span>)</a>
-<a class="sourceLine" id="cb154-3" title="3">df =<span class="st"> </span><span class="kw">readWorksheet</span>(wbk, someSheet)</a></code></pre></div>
+<div class="sourceCode" id="cb158"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb158-1" title="1"><span class="kw">library</span>(XLConnect)</a>
+<a class="sourceLine" id="cb158-2" title="2">wbk &lt;-<span class="st"> </span><span class="kw">loadWorkbook</span>(<span class="st">&quot;myWorkbook.xlsx&quot;</span>)</a>
+<a class="sourceLine" id="cb158-3" title="3">df &lt;-<span class="st"> </span><span class="kw">readWorksheet</span>(wbk, someSheet)</a></code></pre></div>
 </div>
 <div id="reading-from-the-web---1" class="slide section level2">
 <h1>Reading from the web - 1</h1>
-<div class="sourceCode" id="cb155"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb155-1" title="1">URL =<span class="st"> &quot;http://www.casact.org/research/reserve_data/ppauto_pos.csv&quot;</span></a>
-<a class="sourceLine" id="cb155-2" title="2">df =<span class="st"> </span><span class="kw">read.csv</span>(URL, <span class="dt">stringsAsFactors =</span> <span class="ot">FALSE</span>)</a></code></pre></div>
+<div class="sourceCode" id="cb159"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb159-1" title="1">URL &lt;-<span class="st"> &quot;http://www.casact.org/research/reserve_data/ppauto_pos.csv&quot;</span></a>
+<a class="sourceLine" id="cb159-2" title="2">df &lt;-<span class="st"> </span><span class="kw">read.csv</span>(URL, <span class="dt">stringsAsFactors =</span> <span class="ot">FALSE</span>)</a></code></pre></div>
 </div>
 <div id="reading-from-the-web---2" class="slide section level2">
 <h1>Reading from the web - 2</h1>
-<div class="sourceCode" id="cb156"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb156-1" title="1"><span class="kw">library</span>(XML)</a>
-<a class="sourceLine" id="cb156-2" title="2">URL =<span class="st"> &quot;http://www.pro-football-reference.com/teams/nyj/2012_games.htm&quot;</span></a>
-<a class="sourceLine" id="cb156-3" title="3">games =<span class="st"> </span><span class="kw">readHTMLTable</span>(URL, <span class="dt">stringsAsFactors =</span> <span class="ot">FALSE</span>)</a></code></pre></div>
+<div class="sourceCode" id="cb160"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb160-1" title="1"><span class="kw">library</span>(XML)</a>
+<a class="sourceLine" id="cb160-2" title="2">URL &lt;-<span class="st"> &quot;http://www.pro-football-reference.com/teams/nyj/2012_games.htm&quot;</span></a>
+<a class="sourceLine" id="cb160-3" title="3">games &lt;-<span class="st"> </span><span class="kw">readHTMLTable</span>(URL, <span class="dt">stringsAsFactors =</span> <span class="ot">FALSE</span>)</a></code></pre></div>
 </div>
 <div id="reading-from-a-database" class="slide section level2">
 <h1>Reading from a database</h1>
-<div class="sourceCode" id="cb157"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb157-1" title="1"><span class="kw">library</span>(RODBC)</a>
-<a class="sourceLine" id="cb157-2" title="2">myChannel =<span class="st"> </span><span class="kw">odbcConnect</span>(<span class="dt">dsn =</span> <span class="st">&quot;MyDSN_Name&quot;</span>)</a>
-<a class="sourceLine" id="cb157-3" title="3">df =<span class="st"> </span><span class="kw">sqlQuery</span>(myChannel, <span class="st">&quot;SELECT stuff FROM myTable&quot;</span>)</a></code></pre></div>
+<div class="sourceCode" id="cb161"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb161-1" title="1"><span class="co"># other libraries: sqldf, RSQLite</span></a>
+<a class="sourceLine" id="cb161-2" title="2"><span class="kw">library</span>(RODBC)</a>
+<a class="sourceLine" id="cb161-3" title="3">myChannel &lt;-<span class="st"> </span><span class="kw">odbcConnect</span>(<span class="dt">dsn =</span> <span class="st">&quot;MyDSN_Name&quot;</span>)</a>
+<a class="sourceLine" id="cb161-4" title="4">df &lt;-<span class="st"> </span><span class="kw">sqlQuery</span>(myChannel, <span class="st">&quot;SELECT stuff FROM myTable&quot;</span>)</a></code></pre></div>
 </div>
 <div id="read-some-data" class="slide section level2">
 <h1>Read some data</h1>
-<div class="sourceCode" id="cb158"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb158-1" title="1">df =<span class="st"> </span><span class="kw">read.csv</span>(<span class="st">&quot;../data/StateData.csv&quot;</span>)</a></code></pre></div>
-<div class="sourceCode" id="cb159"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb159-1" title="1"><span class="kw">View</span>(df)</a></code></pre></div>
+<div class="sourceCode" id="cb162"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb162-1" title="1">df &lt;-<span class="st"> </span><span class="kw">read.csv</span>(<span class="st">&quot;../data/StateData.csv&quot;</span>)</a></code></pre></div>
+<div class="sourceCode" id="cb163"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb163-1" title="1"><span class="kw">View</span>(df)</a></code></pre></div>
 </div>
 <div id="exercise-1" class="slide section level2">
 <h1>Exercise</h1>
@@ -1057,13 +1071,13 @@ list-style-type: none;
 </div>
 <div id="solution-1" class="slide section level2">
 <h1>Solution</h1>
-<div class="sourceCode" id="cb160"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb160-1" title="1">df =<span class="st"> </span><span class="kw">read.csv</span>(<span class="st">&quot;states.csv&quot;</span>, <span class="dt">stringsAsFactors=</span><span class="ot">FALSE</span>)</a>
-<a class="sourceLine" id="cb160-2" title="2"><span class="co"># order by decreasing premium then take first</span></a>
-<a class="sourceLine" id="cb160-3" title="3">df_filt &lt;-<span class="st"> </span>df[df<span class="op">$</span>PolicyYear <span class="op">==</span><span class="st"> </span><span class="dv">2010</span>, <span class="kw">c</span>(<span class="st">&quot;State&quot;</span>, <span class="st">&quot;NumClaims&quot;</span>)]</a>
-<a class="sourceLine" id="cb160-4" title="4">df_ordered &lt;-<span class="st"> </span>df_filt[<span class="kw">order</span>(df_filt<span class="op">$</span>NumClaims, <span class="dt">decreasing=</span><span class="ot">TRUE</span>),]</a>
-<a class="sourceLine" id="cb160-5" title="5"><span class="kw">print</span>(df_ordered[<span class="dv">1</span>,]<span class="op">$</span>State)</a></code></pre></div>
+<div class="sourceCode" id="cb164"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb164-1" title="1">df &lt;-<span class="st"> </span><span class="kw">read.csv</span>(<span class="st">&quot;states.csv&quot;</span>, <span class="dt">stringsAsFactors=</span><span class="ot">FALSE</span>)</a>
+<a class="sourceLine" id="cb164-2" title="2"><span class="co"># order by decreasing premium then take first</span></a>
+<a class="sourceLine" id="cb164-3" title="3">df_filt &lt;-<span class="st"> </span>df[df<span class="op">$</span>PolicyYear <span class="op">==</span><span class="st"> </span><span class="dv">2010</span>, <span class="kw">c</span>(<span class="st">&quot;State&quot;</span>, <span class="st">&quot;NumClaims&quot;</span>)]</a>
+<a class="sourceLine" id="cb164-4" title="4">df_ordered &lt;-<span class="st"> </span>df_filt[<span class="kw">order</span>(df_filt<span class="op">$</span>NumClaims, <span class="dt">decreasing=</span><span class="ot">TRUE</span>),]</a>
+<a class="sourceLine" id="cb164-5" title="5"><span class="kw">print</span>(df_ordered[<span class="dv">1</span>,]<span class="op">$</span>State)</a></code></pre></div>
 <pre><code>## [1] &quot;California&quot;</code></pre>
-<div class="sourceCode" id="cb162"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb162-1" title="1"><span class="kw">print</span>(df_ordered[<span class="dv">1</span><span class="op">:</span><span class="dv">10</span>,])</a></code></pre></div>
+<div class="sourceCode" id="cb166"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb166-1" title="1"><span class="kw">print</span>(df_ordered[<span class="dv">1</span><span class="op">:</span><span class="dv">10</span>,])</a></code></pre></div>
 <pre><code>##            State NumClaims
 ## 50    California      2441
 ## 320     New York      2105
@@ -1075,10 +1089,10 @@ list-style-type: none;
 ## 100      Georgia       832
 ## 350         Ohio       832
 ## 180    Louisiana       698</code></pre>
-<div class="sourceCode" id="cb164"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb164-1" title="1"><span class="co"># OR, get max premium and then filter on that</span></a>
-<a class="sourceLine" id="cb164-2" title="2">df_filt &lt;-<span class="st"> </span>df[df<span class="op">$</span>PolicyYear <span class="op">==</span><span class="st"> </span><span class="dv">2010</span>, <span class="kw">c</span>(<span class="st">&quot;State&quot;</span>, <span class="st">&quot;NumClaims&quot;</span>)]</a>
-<a class="sourceLine" id="cb164-3" title="3">maxClaims &lt;-<span class="st"> </span><span class="kw">max</span>(df_filt<span class="op">$</span>NumClaims)</a>
-<a class="sourceLine" id="cb164-4" title="4"><span class="kw">print</span>(df_filt[df_filt<span class="op">$</span>NumClaims<span class="op">==</span>maxClaims,]<span class="op">$</span>State)</a></code></pre></div>
+<div class="sourceCode" id="cb168"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb168-1" title="1"><span class="co"># OR, get max premium and then filter on that</span></a>
+<a class="sourceLine" id="cb168-2" title="2">df_filt &lt;-<span class="st"> </span>df[df<span class="op">$</span>PolicyYear <span class="op">==</span><span class="st"> </span><span class="dv">2010</span>, <span class="kw">c</span>(<span class="st">&quot;State&quot;</span>, <span class="st">&quot;NumClaims&quot;</span>)]</a>
+<a class="sourceLine" id="cb168-3" title="3">maxClaims &lt;-<span class="st"> </span><span class="kw">max</span>(df_filt<span class="op">$</span>NumClaims)</a>
+<a class="sourceLine" id="cb168-4" title="4"><span class="kw">print</span>(df_filt[df_filt<span class="op">$</span>NumClaims<span class="op">==</span>maxClaims,]<span class="op">$</span>State)</a></code></pre></div>
 <pre><code>## [1] &quot;California&quot;</code></pre>
 </div>
 
