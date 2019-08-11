@@ -46,7 +46,6 @@ summary(claimsData$GRCODE)
 claimsData43 <- subset(claimsData, GRCODE == 43)
 ```
 
-
 ## The origin trick
 
 From the summary, you can see that the accident and transaction dates were read as integers. To convert it to date in R, we need to know the origin date which in Excel is December 30, 1899.

@@ -1,0 +1,291 @@
+---
+title: Functions
+author: "Steve Berman"
+output:
+  revealjs::revealjs_presentation:
+    center: no
+    css: ./css/revealOpts.css
+    reveal_plugins:
+    - notes
+    - zoom
+    self_contained: no
+    theme: solarized
+    transition: slide
+---
+
+```{r echo=FALSE}
+suppressPackageStartupMessages(library(dplyr))
+suppressPackageStartupMessages(library(knitr))
+knitr::opts_chunk$set(
+    warning=TRUE
+  , error=TRUE
+  , echo=TRUE
+  , message=FALSE
+  , fig.height = 4.5
+  , fig.pos="t"
+  , collapse = TRUE
+)
+knitr::opts_knit$set(root.dir = normalizePath('../'))
+```
+
+# Functions, part 1
+
+## What's the big deal?
+
+```{r eval=FALSE}
+some_var <- sqrt(pi) + 5
+some_function <- function(x) {
+  sqrt(x) + 5
+}
+some_function(pi)
+```
+
+## Here's what's amazing
+
+1. Functions expand your toolset
+2. Functions are __objects__, just like everything else in R
+3. Functions can return any value
+4. 1 and 2 mean that functions can return other functions
+5. Many functions are __vectorized__ (that is, they take vectors and return vectors)
+6. Functions may be altered after they're created
+
+# Basic functions
+
+## R has a great variety of functions that
+
+* Perform mathematical calculations
+* Convert from one data type to another
+* Provide formatting
+* Load data, save data, manipulate data
+* Many more!
+
+# What is a function made of?
+
+## A simple user-defined function
+
+```{r}
+layer <- function(loss, attachment, limit, share){
+  share * pmin(limit, pmax(0, loss - attachment))
+}
+```
+
+## The elements of a function
+
+1. arguments
+2. body
+3. environment - the scope that any object exists in
+
+# Parameters
+
+## Parameters
+
+```{r}
+# formals function allows access and manipulation of formal arguments
+formals(layer)
+```
+
+Note that it _doesn't_ tell you what data types they are. R is not strongly typed.
+
+## Matching arguments
+
+1. Exact matching - actuals and formals must be 1 to 1
+2. Partial matching - (on unmatched) actuals matching the first part of the formals - cannot have multiple matches
+3. Positional matching - unmatched paired with unnamed
+
+## Matching arguments
+
+```{r}
+myFunc <- function(mojo, monkey, banana){
+  print(match.call())   # match.call returns a call in which all arguments are specified by their full names
+}
+
+myFunc(mojo = 1, mo = 2, 3)  # exact, then partial, then positional
+myFunc(mo = 2, mojo = 1, 3)  # order not important - exact matching occurs first
+myFunc(mo = 1, mo = 2, 3)    # CRASH on partial match
+myFunc(1, 2, 3)              # all positional
+```
+
+# Functions, part 2
+
+## Optional values (with defaults)
+
+Allow you to have simple calls or provide a lot more detail
+
+```{r}
+myFunc <- function(a, b = 15) {
+  a + b
+}
+myFunc(3)
+```
+
+No value supplied for the `b` argument, so default used.
+
+## Check inputs
+
+You can use the `missing()` function for this.
+
+```{r}
+myFunc <- function(mojo, monkey, banana){
+  if (missing(banana)) {
+    warning("I can't think without bananas")
+    banana = monkey + 5
+  }
+}
+
+myFunc(1, 2, 3)
+myFunc(1, 2)
+```
+
+## Aside
+
+* `stop()`: This is an error. The program can't go on.
+* `warning()` - This tells the user that something happened and they might not like it, but it's not a critical issue.
+* `message()` - Just sayin' something you might want to hear.
+
+
+## Restrict inputs to set choice
+
+Where a parameter may have only a small logical set of values.
+
+```{r}
+myFunc <- function(x, dist = c("lognormal", "gamma")){
+  # argument verification using partial matching
+  dist = match.arg(dist)
+  print(dist)
+}
+myFunc(1:10, "lo")
+myFunc(1:10, "jo")
+
+myOtherFunc <- function(x, dist = c("lognormal", "gamma")){
+  print(dist)
+}
+myOtherFunc(1:10, "lo")
+myOtherFunc(1:10, "jo")
+myOtherFunc(1:10, c("lo", "jo"))
+```
+
+## Defaults and missing arguments - best practices
+
+* If you _must_ know what the user intends, _or_ if the default requires some logic, don't add a default.
+* If you're fine with common default parameters (i.e. the base of the log function is e or 10), add a default.
+* Don't add a default and check for a missing value. It's confusing and unnecessary.
+
+## Ellipses
+
+`...` is used to pass unspecified arguments to other functions. Typically used if your function sits between the user and some other function like `plot`
+
+```{r, echo=TRUE}
+dfData <- data.frame(PolicyYear = 2001:2010, Premium = rnorm(10))
+myPlotFunc <- function(dfData, ...){
+  plot(dfData$PolicyYear, dfData$Premium, ...)
+}
+```
+
+```{r eval=FALSE}
+myPlotFunc(dfData, pch=18)
+myPlotFunc(dfData, pch=23, col="red")
+```
+
+```{r}
+formals(myPlotFunc)
+```
+
+# Return value
+
+## What does a function return?
+
+Anything.
+
+## return()
+
+* `return()` isn't required. Good practice, though.
+* A function will always return the last evaluated expression.
+* `return()` is often used for _abnormal_ returns
+
+It's good practice to use return statement as this is explicit
+
+```{r}
+myFunc <- function(x) {
+  if (is.na(x)) return("Value missing")
+  
+  sum(x)
+}
+```
+
+
+## Exercise
+
+* $\mu=(E[X])- 0.5 * sigma^2$
+* $\sigma^2=ln(1+cv^2)$
+
+Create a function called LognormalParams, which will translate the mean and CV into parameters for the lognormal distribution. Test it using the following statements:
+
+```{r eval=FALSE}
+LognormalParams(10e3, 3.0)
+LognormalParams(c(10e3, 20e3), 3.0)
+LognormalParams(10e3)
+LognormalParams(CV = 4, 10e3)
+```
+
+## Solution
+
+```{r}
+LognormalParams <- function(mean, CV) {
+  sig2 <- log(1+CV**2)
+  sig <- sqrt(sig2)
+  mu <- mean - 0.5 * sig2
+  return(c(mu, sig))
+}
+```
+
+# If we have time
+
+## Replacement functions
+
+These take the form "xxx<-".  In the example below, the first argument is modified in place.
+
+(These examples are virtually identical to the ones in Hadley's "Advanced R")
+
+```{r}
+`mojo<-` <- function(x, value){
+  x <- x + value
+} 
+gonzo <- 1:10
+gonzo
+mojo(gonzo) <- 5
+gonzo
+```
+
+Why?  In some cases, the format is easier to understand:
+```{r eval=FALSE}
+names(x) <- c("field1", "field2", "field3")
+```
+
+## Replacement functions (2)
+
+```{r}
+`mojo<-` <- function(x, position, value){
+  x[position] <- x[position] + value
+  x
+} 
+gonzo <- rep(1, 10)
+gonzo
+mojo(gonzo, 2) <- 5
+gonzo
+mojo(gonzo, 2:3) <- 5
+gonzo
+```
+
+## Infix functions
+
+Typically R functions are postfix (that is, the parameters come after the function definition)
+
+```{r}
+`%l^%` <- function(a, b){
+  log(sqrt(a +b))
+}
+5 %l^% 3
+log(sqrt(5+3))
+```
+
+
