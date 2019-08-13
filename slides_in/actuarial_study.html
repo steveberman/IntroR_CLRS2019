@@ -57,25 +57,19 @@ code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Inf
 </div>
 <div id="project-overview" class="slide section level1">
 <h1>Project Overview</h1>
-<p>We will estimate reserves for an insurer’s claims data set. We will also define functions to make our code reusable for another insurer.</p>
+<p>We will estimate reserves for an insurer’s claims data set. At every step below, we will store the results in a list object which represents our reserve analysis of the insurer. We will also define functions to make our code reusable for another insurer.</p>
 <ul>
-<li>Part 1 - Load in claims data as data frame<br />
+<li>Part 1 - Load in Claims Data<br />
 </li>
-<li>Part 2 - Generate triangles as matrices<br />
+<li>Part 2 - Create Loss Triangles<br />
 </li>
-<li>Part 3 - Generate some sample diagnostics<br />
+<li>Part 3 - Development Method<br />
 </li>
-<li>Part 4 - Development method<br />
+<li>Part 4 - Initial Expected Loss Ratio method<br />
 </li>
-<li>Part 5 - IELR method<br />
+<li>Part 5 - Bornhuetter Ferguson Method<br />
 </li>
-<li>Part 6 - B-F method<br />
-</li>
-<li>Part 7 - Make a list object storing results from parts 1-6 above<br />
-</li>
-<li>Part 8 - Output exhibits in excel<br />
-</li>
-<li>Part 9 - Run parts 1-7 on another insurer claims data set using defined functions</li>
+<li>Part 6 - Reserve Analysis for another insurer</li>
 </ul>
 </div>
 <div id="load-in-claims-data" class="slide section level1">
@@ -106,6 +100,9 @@ claimsData<span class="op">$</span>GRCODE &lt;-<span class="st"> </span><span cl
 ##  55  55  55  55  55</code></pre>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># Let's analyze insurer with GRCODE 43</span>
 claimsData43 &lt;-<span class="st"> </span><span class="kw">subset</span>(claimsData, GRCODE <span class="op">==</span><span class="st"> </span><span class="dv">43</span>)</code></pre></div>
+</div>
+<div id="load-in-claims-data-1" class="slide section level1">
+<h1>(1) Load in Claims Data</h1>
 <h2 id="the-origin-trick">The origin trick</h2>
 <p>From the summary, you can see that the accident and transaction dates were read as integers. To convert it to date in R, we need to know the origin date which in Excel is December 30, 1899.</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># Convert columns to date</span>
@@ -121,17 +118,7 @@ claimsData43<span class="op">$</span>TransactionDate &lt;-<span class="st"> </sp
 ##  Mean   :1991-06-11   Mean   :1994-06-11  
 ##  3rd Qu.:1993-02-18   3rd Qu.:1996-10-01  
 ##  Max.   :1997-05-21   Max.   :1997-10-28</code></pre>
-</div>
-<div id="create-loss-triangles" class="slide section level1">
-<h1>(2) Create loss triangles</h1>
-<p>Our loss triangles will be 10x10 matrices with 2 dimensions - accident year and development age (in months)</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># create triangle matrices</span>
-accYears &lt;-<span class="st"> </span><span class="dv">1988</span><span class="op">:</span>(<span class="dv">1988</span><span class="op">+</span><span class="dv">10</span><span class="op">-</span><span class="dv">1</span>)
-devAges &lt;-<span class="st"> </span><span class="dv">12</span><span class="op">*</span><span class="kw">c</span>(<span class="dv">1</span><span class="op">:</span><span class="dv">10</span>)
-paidTri &lt;-<span class="st"> </span><span class="kw">matrix</span>(<span class="dt">nrow =</span> <span class="dv">10</span>, <span class="dt">ncol =</span> <span class="dv">10</span>,
-                  <span class="dt">dimnames =</span> <span class="kw">list</span>(accYears, devAges))
-incTri &lt;-<span class="st"> </span>paidTri</code></pre></div>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># create columns for accident years and development ages</span>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># Calculate accident years and development ages</span>
 <span class="kw">library</span>(lubridate)</code></pre></div>
 <pre><code>## 
 ## Attaching package: 'lubridate'</code></pre>
@@ -140,23 +127,772 @@ incTri &lt;-<span class="st"> </span>paidTri</code></pre></div>
 ##     date</code></pre>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">claimsData43<span class="op">$</span>AccidentYear &lt;-<span class="st"> </span><span class="kw">year</span>(claimsData43<span class="op">$</span>AccidentDate)
 claimsData43<span class="op">$</span>DevAge &lt;-<span class="st"> </span><span class="dv">12</span><span class="op">*</span>(<span class="kw">year</span>(claimsData43<span class="op">$</span>TransactionDate)<span class="op">-</span>
-<span class="st">                             </span><span class="kw">year</span>(claimsData43<span class="op">$</span>AccidentDate)<span class="op">+</span><span class="dv">1</span>)
+<span class="st">                          </span><span class="kw">year</span>(claimsData43<span class="op">$</span>AccidentDate)<span class="op">+</span><span class="dv">1</span>)</code></pre></div>
+</div>
+<div id="load-in-claims-data-2" class="slide section level1">
+<h1>(1) Load in Claims Data</h1>
+<p>Creating a function to compile data.</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># The function will take in 2 arguments</span>
+<span class="co"># data: claims data for all insurers</span>
+<span class="co"># insurerCode: the GR code of insurer that we want to analyze</span>
+compileData &lt;-<span class="st"> </span><span class="cf">function</span>(data, insurerCode){
+  <span class="kw">library</span>(lubridate)
+  <span class="co"># GRCODE represents the code assigned to individual insurers by NAIC</span>
+  data<span class="op">$</span>GRCODE &lt;-<span class="st"> </span><span class="kw">as.factor</span>(data<span class="op">$</span>GRCODE)
 
-<span class="co"># sort first by accident year and then by development age</span>
-claimsData43 &lt;-<span class="st"> </span>claimsData43[<span class="kw">order</span>(claimsData43<span class="op">$</span>AccidentYear,
-                                   claimsData43<span class="op">$</span>DevAge),]
+  <span class="co"># Let's analyze insurer with GRCODE = insurerCode</span>
+  insurerData &lt;-<span class="st"> </span><span class="kw">subset</span>(data, GRCODE <span class="op">==</span><span class="st"> </span>insurerCode)
+  
+  <span class="co"># Convert columns to date</span>
+  insurerData<span class="op">$</span>AccidentDate &lt;-<span class="st"> </span><span class="kw">as.Date</span>(insurerData<span class="op">$</span>AccidentDate,
+                                      <span class="dt">origin =</span> <span class="st">&quot;1899-12-30&quot;</span>)
+  insurerData<span class="op">$</span>TransactionDate &lt;-<span class="st"> </span><span class="kw">as.Date</span>(insurerData<span class="op">$</span>TransactionDate,
+                                         <span class="dt">origin =</span> <span class="st">&quot;1899-12-30&quot;</span>)
+  
+  <span class="co"># Calculate accident years and development ages</span>
+  insurerData<span class="op">$</span>AccidentYear &lt;-<span class="st"> </span><span class="kw">year</span>(insurerData<span class="op">$</span>AccidentDate)
+  insurerData<span class="op">$</span>DevAge &lt;-<span class="st"> </span><span class="dv">12</span><span class="op">*</span>(<span class="kw">year</span>(insurerData<span class="op">$</span>TransactionDate)<span class="op">-</span>
+<span class="st">                            </span><span class="kw">year</span>(insurerData<span class="op">$</span>AccidentDate)<span class="op">+</span><span class="dv">1</span>)
+  
+  <span class="co"># Output compiled data</span>
+  <span class="kw">return</span>(insurerData)
+}</code></pre></div>
+</div>
+<div id="load-in-claims-data-3" class="slide section level1">
+<h1>(1) Load in Claims Data</h1>
+<p>Creating an insurer list object.</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># initializing the list object that represents insurer's reserve analysis</span>
+insurer43 &lt;-<span class="st"> </span><span class="kw">list</span>(<span class="dt">data =</span> <span class="ot">NA</span>)
+<span class="co"># storing compiled data for insurer with GRCODE 43</span>
+insurer43<span class="op">$</span>data &lt;-<span class="st"> </span><span class="kw">compileData</span>(<span class="dt">data =</span> claimsData, <span class="dt">insurerCode =</span> <span class="dv">43</span>)
+<span class="kw">summary</span>(insurer43<span class="op">$</span>data)</code></pre></div>
+<pre><code>##  GRCODE      GRNAME           AccidentDate        TransactionDate     
+##  43 :55   Length:55          Min.   :1988-01-22   Min.   :1988-05-27  
+##  266: 0   Class :character   1st Qu.:1989-06-18   1st Qu.:1992-10-18  
+##  353: 0   Mode  :character   Median :1991-01-05   Median :1994-05-16  
+##  388: 0                      Mean   :1991-06-11   Mean   :1994-06-11  
+##  460: 0                      3rd Qu.:1993-02-18   3rd Qu.:1996-10-01  
+##                              Max.   :1997-05-21   Max.   :1997-10-28  
+##    IncurLoss      CumPaidLoss    EarnedPremNet   PostedReserve97
+##  Min.   :  582   Min.   :  133   Min.   :  895   Min.   :73044  
+##  1st Qu.: 2918   1st Qu.: 2472   1st Qu.: 3407   1st Qu.:73044  
+##  Median :11422   Median : 8743   Median :16784   Median :73044  
+##  Mean   :17422   Mean   :11965   Mean   :18269   Mean   :73044  
+##  3rd Qu.:30435   3rd Qu.:19104   3rd Qu.:35138   3rd Qu.:73044  
+##  Max.   :44436   Max.   :38338   Max.   :51845   Max.   :73044  
+##   AccidentYear      DevAge   
+##  Min.   :1988   Min.   : 12  
+##  1st Qu.:1989   1st Qu.: 24  
+##  Median :1991   Median : 48  
+##  Mean   :1991   Mean   : 48  
+##  3rd Qu.:1993   3rd Qu.: 72  
+##  Max.   :1997   Max.   :120</code></pre>
+</div>
+<div id="create-triangles" class="slide section level1">
+<h1>(2) Create triangles</h1>
+<p>Our loss triangles will be 10x10 matrices with 2 dimensions - accident year and development age (in months).</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># create paid triangle matrix</span>
+accYears &lt;-<span class="st"> </span><span class="kw">sort</span>(<span class="kw">unique</span>(insurer43<span class="op">$</span>data<span class="op">$</span>AccidentYear))
+devAges &lt;-<span class="st"> </span><span class="kw">sort</span>(<span class="kw">unique</span>(insurer43<span class="op">$</span>data<span class="op">$</span>DevAge))
+paidTri &lt;-<span class="st"> </span><span class="kw">matrix</span>(<span class="dt">nrow =</span> <span class="kw">length</span>(accYears), <span class="dt">ncol =</span> <span class="kw">length</span>(devAges),
+                  <span class="dt">dimnames =</span> <span class="kw">list</span>(accYears, devAges))
 
-<span class="co"># create cumulative loss triangles</span>
+<span class="co"># create cumulative paid loss triangle</span>
 <span class="cf">for</span>(i <span class="cf">in</span> <span class="dv">1</span><span class="op">:</span><span class="kw">length</span>(accYears)){
   <span class="cf">for</span>(j <span class="cf">in</span> <span class="dv">1</span><span class="op">:</span>(<span class="kw">length</span>(devAges)<span class="op">-</span>i<span class="op">+</span><span class="dv">1</span>)){
-    paidTri[i,j] &lt;-<span class="st"> </span><span class="kw">as.numeric</span>(<span class="kw">subset</span>(claimsData43,
+    paidTri[i,j] &lt;-<span class="st"> </span><span class="kw">as.numeric</span>(<span class="kw">subset</span>(insurer43<span class="op">$</span>data,
                                      AccidentYear <span class="op">==</span><span class="st"> </span>accYears[i] <span class="op">&amp;</span><span class="st"> </span>DevAge <span class="op">==</span><span class="st"> </span>devAges[j],
                                      CumPaidLoss))
-    incTri[i,j] &lt;-<span class="st"> </span><span class="kw">as.numeric</span>(<span class="kw">subset</span>(claimsData43,
-                                     AccidentYear <span class="op">==</span><span class="st"> </span>accYears[i] <span class="op">&amp;</span><span class="st"> </span>DevAge <span class="op">==</span><span class="st"> </span>devAges[j],
-                                     IncurLoss))
+    
   }
+}
+paidTri</code></pre></div>
+<pre><code>##         12    24    36    48    60    72    84   96  108 120
+## 1988   133   333   431   570   615   615   615  614  614 614
+## 1989   934  1746  2365  2579  2763  2966  2940 2978 2978  NA
+## 1990  2030  4864  6880  8087  8595  8743  8763 8762   NA  NA
+## 1991  4537 11527 15123 16656 17321 18076 18308   NA   NA  NA
+## 1992  7564 16061 22465 25204 26517 27124    NA   NA   NA  NA
+## 1993  8343 19900 26732 30079 31249    NA    NA   NA   NA  NA
+## 1994 12565 26922 33867 38338    NA    NA    NA   NA   NA  NA
+## 1995 13437 26012 31677    NA    NA    NA    NA   NA   NA  NA
+## 1996 12604 23446    NA    NA    NA    NA    NA   NA   NA  NA
+## 1997 12292    NA    NA    NA    NA    NA    NA   NA   NA  NA</code></pre>
+</div>
+<div id="create-triangles-1" class="slide section level1">
+<h1>(2) Create triangles</h1>
+<p>Create a function to process triangles.</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># create function to create triangles</span>
+createTriangles &lt;-<span class="st"> </span><span class="cf">function</span>(data, triColName, triType){
+  <span class="co"># create triangle matrix</span>
+  accYears &lt;-<span class="st"> </span><span class="kw">sort</span>(<span class="kw">unique</span>(data<span class="op">$</span>AccidentYear))
+  devAges &lt;-<span class="st"> </span><span class="kw">sort</span>(<span class="kw">unique</span>(data<span class="op">$</span>DevAge))
+  tri &lt;-<span class="st"> </span><span class="kw">matrix</span>(<span class="dt">nrow =</span> <span class="kw">length</span>(accYears), <span class="dt">ncol =</span> <span class="kw">length</span>(devAges),
+                <span class="dt">dimnames =</span> <span class="kw">list</span>(accYears, devAges))
+  
+  <span class="co"># a matrix has different attributes</span>
+  <span class="co"># you can add a comment using the comment attribute</span>
+  <span class="co"># add comment on type of triangle</span>
+  <span class="kw">comment</span>(tri) &lt;-<span class="st"> </span>triType
+  
+  <span class="co"># create cumulative paid loss triangle</span>
+  <span class="cf">for</span>(i <span class="cf">in</span> <span class="dv">1</span><span class="op">:</span><span class="kw">length</span>(accYears)){
+    <span class="cf">for</span>(j <span class="cf">in</span> <span class="dv">1</span><span class="op">:</span>(<span class="kw">length</span>(devAges)<span class="op">-</span>i<span class="op">+</span><span class="dv">1</span>)){
+      tri[i,j] &lt;-<span class="st"> </span><span class="kw">as.numeric</span>(<span class="kw">subset</span>(data,
+                                    AccidentYear <span class="op">==</span><span class="st"> </span>accYears[i] <span class="op">&amp;</span><span class="st"> </span>DevAge <span class="op">==</span><span class="st"> </span>devAges[j],
+                                    triColName))
+      
+    }
+  }
+  
+  <span class="kw">return</span>(tri)
+}
+
+<span class="co"># paid and reported loss triangle</span>
+insurer43<span class="op">$</span>rptdTri &lt;-<span class="st"> </span><span class="kw">createTriangles</span>(insurer43<span class="op">$</span>data, <span class="st">&quot;IncurLoss&quot;</span>, <span class="st">&quot;Reported&quot;</span>)
+insurer43<span class="op">$</span>paidTri &lt;-<span class="st"> </span><span class="kw">createTriangles</span>(insurer43<span class="op">$</span>data, <span class="st">&quot;CumPaidLoss&quot;</span>, <span class="st">&quot;Paid&quot;</span>)
+insurer43<span class="op">$</span>rptdTri</code></pre></div>
+<pre><code>##         12    24    36    48    60    72    84   96  108 120
+## 1988   607   647   582   598   614   615   615  614  614 614
+## 1989  2254  2859  2979  2764  2826  3017  2990 2978 2978  NA
+## 1990  5843  7424  8307  8671  9066  8926  8767 8765   NA  NA
+## 1991 11422 16093 18648 19095 18653 18469 18407   NA   NA  NA
+## 1992 19933 24162 28739 28329 28071 27722    NA   NA   NA  NA
+## 1993 24604 32130 33575 32769 33722    NA    NA   NA   NA  NA
+## 1994 40735 43944 42511 41712    NA    NA    NA   NA   NA  NA
+## 1995 43064 43705 42909    NA    NA    NA    NA   NA   NA  NA
+## 1996 41837 41304    NA    NA    NA    NA    NA   NA   NA  NA
+## 1997 44436    NA    NA    NA    NA    NA    NA   NA   NA  NA</code></pre>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">insurer43<span class="op">$</span>paidTri</code></pre></div>
+<pre><code>##         12    24    36    48    60    72    84   96  108 120
+## 1988   133   333   431   570   615   615   615  614  614 614
+## 1989   934  1746  2365  2579  2763  2966  2940 2978 2978  NA
+## 1990  2030  4864  6880  8087  8595  8743  8763 8762   NA  NA
+## 1991  4537 11527 15123 16656 17321 18076 18308   NA   NA  NA
+## 1992  7564 16061 22465 25204 26517 27124    NA   NA   NA  NA
+## 1993  8343 19900 26732 30079 31249    NA    NA   NA   NA  NA
+## 1994 12565 26922 33867 38338    NA    NA    NA   NA   NA  NA
+## 1995 13437 26012 31677    NA    NA    NA    NA   NA   NA  NA
+## 1996 12604 23446    NA    NA    NA    NA    NA   NA   NA  NA
+## 1997 12292    NA    NA    NA    NA    NA    NA   NA   NA  NA</code></pre>
+</div>
+<div id="create-triangles-2" class="slide section level1">
+<h1>(2) Create triangles</h1>
+<p>Get and store earned premium data.</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># get earned premium for accident years</span>
+accYears &lt;-<span class="st"> </span><span class="kw">sort</span>(<span class="kw">unique</span>(insurer43<span class="op">$</span>data<span class="op">$</span>AccidentYear))
+insurer43<span class="op">$</span>earnPrem &lt;-<span class="st"> </span><span class="kw">sapply</span>(accYears,
+                             <span class="cf">function</span>(x) <span class="kw">unique</span>(insurer43<span class="op">$</span>data<span class="op">$</span>EarnedPremNet[insurer43<span class="op">$</span>data<span class="op">$</span>AccidentYear <span class="op">==</span><span class="st"> </span>x]))
+<span class="co"># totals</span>
+insurer43<span class="op">$</span>earnPrem &lt;-<span class="st"> </span><span class="kw">c</span>(insurer43<span class="op">$</span>earnPrem, <span class="kw">sum</span>(insurer43<span class="op">$</span>earnPrem))
+<span class="co"># add row names</span>
+<span class="kw">names</span>(insurer43<span class="op">$</span>earnPrem) &lt;-<span class="st"> </span><span class="kw">c</span>(accYears, <span class="st">&quot;Total&quot;</span>)
+insurer43<span class="op">$</span>earnPrem</code></pre></div>
+<pre><code>##   1988   1989   1990   1991   1992   1993   1994   1995   1996   1997 
+##    895   3407   5889  16784  27647  35138  42605  47629  46929  51845 
+##  Total 
+## 278768</code></pre>
+</div>
+<div id="development-method" class="slide section level1">
+<h1>(3) Development Method</h1>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># Chainladder development method</span>
+<span class="co"># Arguments:</span>
+<span class="co"># triangle = triangle matrix object to run the development method on</span>
+<span class="co"># paidTri = paid loss triangle matrix object to get unpaid loss</span>
+<span class="co"># tail = tail factor to use in development method</span>
+<span class="co">#      = (optional) argument with default value 1</span>
+devMethod &lt;-<span class="st"> </span><span class="cf">function</span>(triangle, paidTri, <span class="dt">tail=</span><span class="dv">1</span>){
+  <span class="co"># data frame to store dev method results</span>
+  results &lt;-<span class="st"> </span><span class="kw">data.frame</span>(<span class="dt">accYear =</span> <span class="kw">c</span>(<span class="kw">row.names</span>(triangle), <span class="st">&quot;Total&quot;</span>),
+                        <span class="dt">latestLoss =</span> <span class="ot">NA</span>, <span class="dt">latestPaid =</span> <span class="ot">NA</span>,
+                        <span class="dt">ata =</span> <span class="ot">NA</span>, <span class="dt">atu =</span> <span class="ot">NA</span>, <span class="dt">ult =</span> <span class="ot">NA</span>, <span class="dt">unpaid =</span> <span class="ot">NA</span>)
+  
+  <span class="co"># ATA/ATU for oldest year will be our tail factor</span>
+  results<span class="op">$</span>ata[<span class="dv">1</span>] &lt;-<span class="st"> </span>tail
+  results<span class="op">$</span>atu[<span class="dv">1</span>] &lt;-<span class="st"> </span>tail
+  
+  <span class="co"># latest loss for oldest year</span>
+  results<span class="op">$</span>latestLoss[<span class="dv">1</span>] &lt;-<span class="st"> </span>triangle[<span class="dv">1</span>, <span class="kw">ncol</span>(triangle)]
+  <span class="co"># latest paid loss for oldest year</span>
+  results<span class="op">$</span>latestPaid[<span class="dv">1</span>] &lt;-<span class="st"> </span>paidTri[<span class="dv">1</span>, <span class="kw">ncol</span>(paidTri)]
+  
+  <span class="co"># calculate ATA/ATU for remaining years</span>
+  <span class="cf">for</span>(j <span class="cf">in</span> <span class="kw">seq</span>(<span class="kw">ncol</span>(triangle), <span class="dv">2</span>, <span class="op">-</span><span class="dv">1</span>)){
+    <span class="co"># calculate position of latest AY for dev age j</span>
+    i &lt;-<span class="st"> </span><span class="kw">nrow</span>(triangle) <span class="op">-</span><span class="st"> </span>j <span class="op">+</span><span class="st"> </span><span class="dv">1</span> 
+    <span class="co"># ATA for AY i+1 from age j-1 to j (all year weighted average)</span>
+    results<span class="op">$</span>ata[i<span class="op">+</span><span class="dv">1</span>] &lt;-<span class="st"> </span><span class="kw">sum</span>(triangle[<span class="dv">1</span><span class="op">:</span>i,j])<span class="op">/</span><span class="kw">sum</span>(triangle[<span class="dv">1</span><span class="op">:</span>i,j<span class="op">-</span><span class="dv">1</span>])
+    <span class="co"># ATU for AY i+1 from age j-1 to ult</span>
+    results<span class="op">$</span>atu[i<span class="op">+</span><span class="dv">1</span>] &lt;-<span class="st"> </span>results<span class="op">$</span>atu[i]<span class="op">*</span>results<span class="op">$</span>ata[i<span class="op">+</span><span class="dv">1</span>]
+    <span class="co"># latest loss for AY i+1</span>
+    results<span class="op">$</span>latestLoss[i<span class="op">+</span><span class="dv">1</span>] &lt;-<span class="st"> </span>triangle[i<span class="op">+</span><span class="dv">1</span>, j<span class="op">-</span><span class="dv">1</span>]
+    <span class="co"># latest paid loss for AY i+1</span>
+    results<span class="op">$</span>latestPaid[i<span class="op">+</span><span class="dv">1</span>] &lt;-<span class="st"> </span>paidTri[i<span class="op">+</span><span class="dv">1</span>, j<span class="op">-</span><span class="dv">1</span>]
+  }
+  
+  <span class="co"># ultimate loss</span>
+  results<span class="op">$</span>ult &lt;-<span class="st"> </span>results<span class="op">$</span>latestLoss<span class="op">*</span>results<span class="op">$</span>atu
+  <span class="co"># unpaid loss</span>
+  results<span class="op">$</span>unpaid &lt;-<span class="st"> </span>results<span class="op">$</span>ult <span class="op">-</span><span class="st"> </span>results<span class="op">$</span>latestPaid
+  
+  <span class="co"># totals</span>
+  results[<span class="kw">nrow</span>(results), <span class="kw">c</span>(<span class="dv">2</span><span class="op">:</span><span class="dv">3</span>, <span class="dv">6</span><span class="op">:</span><span class="dv">7</span>)] &lt;-<span class="st"> </span><span class="kw">sapply</span>(<span class="kw">c</span>(<span class="dv">2</span><span class="op">:</span><span class="dv">3</span>, <span class="dv">6</span><span class="op">:</span><span class="dv">7</span>),
+                                                <span class="cf">function</span>(x) <span class="kw">sum</span>(results[<span class="op">-</span><span class="kw">nrow</span>(results), x]))
+  
+  <span class="co"># set column names</span>
+  <span class="kw">colnames</span>(results) &lt;-<span class="st"> </span><span class="kw">c</span>(<span class="st">&quot;Accident Year&quot;</span>, <span class="kw">paste</span>(<span class="st">&quot;Latest&quot;</span>, <span class="kw">comment</span>(triangle)),
+                         <span class="st">&quot;Latest Paid&quot;</span>, <span class="st">&quot;Age-to-Age&quot;</span>, <span class="st">&quot;Age-to-Ult&quot;</span>,
+                         <span class="st">&quot;Ultimate Loss&quot;</span>, <span class="st">&quot;Unpaid Loss&quot;</span>)
+  
+  <span class="co"># output results</span>
+  <span class="kw">return</span>(results)
 }</code></pre></div>
+</div>
+<div id="development-method-1" class="slide section level1">
+<h1>(3) Development Method</h1>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># calculate and store dev method results for insurer 43</span>
+<span class="co"># paid dev method</span>
+insurer43<span class="op">$</span>paidDev &lt;-<span class="st"> </span><span class="kw">devMethod</span>(<span class="dt">triangle =</span> insurer43<span class="op">$</span>paidTri,
+                               <span class="dt">paidTri =</span> insurer43<span class="op">$</span>paidTri,
+                               <span class="dt">tail =</span> <span class="dv">1</span>)
+<span class="co"># reported dev method</span>
+insurer43<span class="op">$</span>rptdDev &lt;-<span class="st"> </span><span class="kw">devMethod</span>(<span class="dt">triangle =</span> insurer43<span class="op">$</span>rptdTri,
+                               <span class="dt">paidTri =</span> insurer43<span class="op">$</span>paidTri,
+                               <span class="dt">tail =</span> <span class="dv">1</span>)
+
+insurer43<span class="op">$</span>paidDev</code></pre></div>
+<pre><code>##    Accident Year Latest Paid Latest Paid Age-to-Age Age-to-Ult
+## 1           1988         614         614   1.000000   1.000000
+## 2           1989        2978        2978   1.000000   1.000000
+## 3           1990        8762        8762   1.000000   1.000000
+## 4           1991       18308       18308   1.002923   1.002923
+## 5           1992       27124       27124   1.007434   1.010378
+## 6           1993       31249       31249   1.030693   1.041390
+## 7           1994       38338       38338   1.046709   1.090032
+## 8           1995       31677       31677   1.126549   1.227975
+## 9           1996       23446       23446   1.299679   1.595973
+## 10          1997       12292       12292   2.104864   3.359306
+## 11         Total      194788      194788         NA         NA
+##    Ultimate Loss Unpaid Loss
+## 1         614.00     0.00000
+## 2        2978.00     0.00000
+## 3        8762.00     0.00000
+## 4       18361.51    53.50609
+## 5       27405.51   281.50616
+## 6       32542.39  1293.39329
+## 7       41789.64  3451.64402
+## 8       38898.56  7221.55882
+## 9       37419.18 13973.17580
+## 10      41292.59 29000.58820
+## 11     250063.37 55275.37238</code></pre>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">insurer43<span class="op">$</span>rptdDev</code></pre></div>
+<pre><code>##    Accident Year Latest Reported Latest Paid Age-to-Age Age-to-Ult
+## 1           1988             614         614  1.0000000  1.0000000
+## 2           1989            2978        2978  1.0000000  1.0000000
+## 3           1990            8765        8762  1.0000000  1.0000000
+## 4           1991           18407       18308  0.9987876  0.9987876
+## 5           1992           27722       27124  0.9920070  0.9908042
+## 6           1993           33722       31249  0.9918791  0.9827580
+## 7           1994           41712       38338  1.0078720  0.9904943
+## 8           1995           42909       31677  0.9896336  0.9802264
+## 9           1996           41304       23446  1.0426172  1.0220009
+## 10          1997           44436       12292  1.1154446  1.1399854
+## 11         Total          262569      194788         NA         NA
+##    Ultimate Loss Unpaid Loss
+## 1         614.00     0.00000
+## 2        2978.00     0.00000
+## 3        8765.00     3.00000
+## 4       18384.68    76.68307
+## 5       27467.08   343.07507
+## 6       33140.57  1891.56630
+## 7       41315.50  2977.49695
+## 8       42060.53 10383.53466
+## 9       42212.72 18766.72377
+## 10      50656.39 38364.39081
+## 11     267594.47 72806.47063</code></pre>
+</div>
+<div id="initial-expected-loss-ratio" class="slide section level1">
+<h1>(4) Initial Expected Loss Ratio</h1>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># IELR method</span>
+<span class="co"># Arguments:</span>
+<span class="co"># rptdTri = reported loss triangle</span>
+<span class="co"># paidTri = paid loss triangle</span>
+<span class="co"># earnPrem = earned premium</span>
+<span class="co"># tail = tail factor to develop losses</span>
+<span class="co"># ultType = 0 to use average of rptd and paid developed losses</span>
+<span class="co">#         = 1 to use rptd developed losses</span>
+<span class="co">#         = 2 to use paid developed losses</span>
+<span class="co"># nyears = number of recent years to include in IELR straight average</span>
+<span class="co"># excludeYears = number of recent years to exclude in IELR straight average</span>
+IELR &lt;-<span class="st"> </span><span class="cf">function</span>(rptdTri, paidTri, earnPrem, <span class="dt">tail=</span><span class="dv">1</span>, <span class="dt">ultType =</span> <span class="dv">0</span>, <span class="dt">nyears=</span><span class="dv">5</span>, <span class="dt">excludeYears=</span><span class="dv">1</span>){
+  <span class="co"># data frame to store ielr method results</span>
+  results &lt;-<span class="st"> </span><span class="kw">data.frame</span>(<span class="dt">accYear =</span> <span class="kw">names</span>(earnPrem),
+                        <span class="dt">latestPaid =</span> <span class="ot">NA</span>, <span class="dt">earnPrem =</span> earnPrem,
+                        <span class="dt">devLoss =</span> <span class="ot">NA</span>, <span class="dt">ultLR =</span> <span class="ot">NA</span>, <span class="dt">selLR =</span> <span class="ot">NA</span>,
+                        <span class="dt">ult =</span> <span class="ot">NA</span>, <span class="dt">unpaid =</span> <span class="ot">NA</span>)
+  
+  <span class="co"># get developed loss using CL method</span>
+  rptdDev &lt;-<span class="st"> </span><span class="kw">devMethod</span>(<span class="dt">triangle =</span> rptdTri, <span class="dt">paidTri =</span> paidTri,
+                       <span class="dt">tail =</span> tail)
+  paidDev &lt;-<span class="st"> </span><span class="kw">devMethod</span>(<span class="dt">triangle =</span> paidTri, <span class="dt">paidTri =</span> paidTri,
+                       <span class="dt">tail =</span> tail)
+  <span class="cf">if</span>(ultType <span class="op">==</span><span class="st"> </span><span class="dv">0</span>){
+    results<span class="op">$</span>devLoss &lt;-<span class="st"> </span>(rptdDev[,<span class="kw">c</span>(<span class="st">&quot;Ultimate Loss&quot;</span>)] <span class="op">+</span><span class="st"> </span>paidDev[,<span class="kw">c</span>(<span class="st">&quot;Ultimate Loss&quot;</span>)])<span class="op">/</span><span class="dv">2</span>
+  } <span class="cf">else</span> <span class="cf">if</span>(ultType <span class="op">==</span><span class="st"> </span><span class="dv">1</span>){
+    results<span class="op">$</span>devLoss &lt;-<span class="st"> </span>rptdDev[,<span class="kw">c</span>(<span class="st">&quot;Ultimate Loss&quot;</span>)]
+  } <span class="cf">else</span>{
+    results<span class="op">$</span>devLoss &lt;-<span class="st"> </span>paidDev[,<span class="kw">c</span>(<span class="st">&quot;Ultimate Loss&quot;</span>)]
+  }
+  
+  
+  <span class="co"># store latest loss, latest paid loss and earned premium</span>
+  results<span class="op">$</span>latestPaid &lt;-<span class="st"> </span>paidDev[, <span class="kw">c</span>(<span class="st">&quot;Latest Paid&quot;</span>)]
+  
+  <span class="co"># calculate ultimate loss ratio</span>
+  results<span class="op">$</span>ultLR &lt;-<span class="st"> </span>results<span class="op">$</span>devLoss <span class="op">/</span><span class="st"> </span>results<span class="op">$</span>earnPrem
+  
+  <span class="co"># selected loss ratio as straight average of nyears LR</span>
+  ## calculate position of latest AY to include in IELR calculation
+  latestAYPos &lt;-<span class="st"> </span><span class="kw">nrow</span>(results)<span class="op">-</span><span class="dv">1</span><span class="op">-</span>excludeYears
+  results<span class="op">$</span>selLR &lt;-<span class="st"> </span><span class="kw">mean</span>(results<span class="op">$</span>ultLR[<span class="kw">seq</span>(latestAYPos<span class="op">-</span>nyears<span class="op">+</span><span class="dv">1</span>, latestAYPos)])
+  
+  <span class="co"># ultimate and unpaid loss</span>
+  results<span class="op">$</span>ult &lt;-<span class="st"> </span>results<span class="op">$</span>earnPrem <span class="op">*</span><span class="st"> </span>results<span class="op">$</span>selLR
+  results<span class="op">$</span>unpaid &lt;-<span class="st"> </span>results<span class="op">$</span>ult <span class="op">-</span><span class="st"> </span>results<span class="op">$</span>latestPaid
+  
+  <span class="co"># set column names</span>
+  <span class="kw">colnames</span>(results) &lt;-<span class="st"> </span><span class="kw">c</span>(<span class="st">&quot;Accident Year&quot;</span>, <span class="st">&quot;Latest Paid&quot;</span>, <span class="st">&quot;Earned Premium&quot;</span>,
+                         <span class="st">&quot;Development Method Ultimate&quot;</span>, <span class="st">&quot;Ultimate Loss Ratio&quot;</span>, <span class="st">&quot;Selected Loss Ratio&quot;</span>,
+                         <span class="st">&quot;IELR Ultimate Loss&quot;</span>, <span class="st">&quot;IELR Unpaid Loss&quot;</span>)
+  
+  <span class="co"># output results</span>
+  <span class="kw">return</span>(results)
+}</code></pre></div>
+</div>
+<div id="initial-expected-loss-ratio-1" class="slide section level1">
+<h1>(4) Initial Expected Loss Ratio</h1>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># calculate and store IELR method results for insurer 43</span>
+insurer43<span class="op">$</span>ielr &lt;-<span class="st"> </span><span class="kw">IELR</span>(<span class="dt">rptdTri =</span> insurer43<span class="op">$</span>rptdTri, <span class="dt">paidTri =</span> insurer43<span class="op">$</span>paidTri,
+                       <span class="dt">earnPrem =</span> insurer43<span class="op">$</span>earnPrem)
+insurer43<span class="op">$</span>ielr</code></pre></div>
+<pre><code>##       Accident Year Latest Paid Earned Premium Development Method Ultimate
+## 1988           1988         614            895                      614.00
+## 1989           1989        2978           3407                     2978.00
+## 1990           1990        8762           5889                     8763.50
+## 1991           1991       18308          16784                    18373.09
+## 1992           1992       27124          27647                    27436.29
+## 1993           1993       31249          35138                    32841.48
+## 1994           1994       38338          42605                    41552.57
+## 1995           1995       31677          47629                    40479.55
+## 1996           1996       23446          46929                    39815.95
+## 1997           1997       12292          51845                    45974.49
+## Total         Total      194788         278768                   258828.92
+##       Ultimate Loss Ratio Selected Loss Ratio IELR Ultimate Loss
+## 1988            0.6860335           0.9201284           823.5149
+## 1989            0.8740828           0.9201284          3134.8773
+## 1990            1.4881134           0.9201284          5418.6359
+## 1991            1.0946791           0.9201284         15443.4343
+## 1992            0.9923786           0.9201284         25438.7887
+## 1993            0.9346428           0.9201284         32331.4702
+## 1994            0.9752980           0.9201284         39202.0686
+## 1995            0.8498929           0.9201284         43824.7935
+## 1996            0.8484295           0.9201284         43180.7037
+## 1997            0.8867680           0.9201284         47704.0547
+## Total           0.9284743           0.9201284        256502.3418
+##       IELR Unpaid Loss
+## 1988          209.5149
+## 1989          156.8773
+## 1990        -3343.3641
+## 1991        -2864.5657
+## 1992        -1685.2113
+## 1993         1082.4702
+## 1994          864.0686
+## 1995        12147.7935
+## 1996        19734.7037
+## 1997        35412.0547
+## Total       61714.3418</code></pre>
+</div>
+<div id="bornheutter-ferguson-method" class="slide section level1">
+<h1>(5) Bornheutter-Ferguson Method</h1>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># B-F Method</span>
+<span class="co"># Arguments:</span>
+<span class="co"># devResults = data frame object with development method results</span>
+<span class="co"># ielrResults = data frame object with IELR method results</span>
+<span class="co"># triType = &quot;Paid&quot; to use paid development patterns</span>
+<span class="co">#         = &quot;Reported&quot; to use reported development patterns</span>
+BF &lt;-<span class="st"> </span><span class="cf">function</span>(devResults, ielrResults, triType){
+  <span class="co"># data frame to store ielr method results</span>
+  results &lt;-<span class="st"> </span><span class="kw">data.frame</span>(<span class="dt">accYear =</span> devResults<span class="op">$</span><span class="st">`</span><span class="dt">Accident Year</span><span class="st">`</span>,
+                        <span class="dt">latestLoss =</span> <span class="ot">NA</span>, <span class="dt">latestPaid =</span> <span class="ot">NA</span>,
+                        <span class="dt">devPct =</span> <span class="ot">NA</span>, <span class="dt">devPctMod =</span> <span class="ot">NA</span>, <span class="dt">devEst =</span> <span class="ot">NA</span>, <span class="dt">ielrEst =</span> <span class="ot">NA</span>,
+                        <span class="dt">ult =</span> <span class="ot">NA</span>, <span class="dt">unpaid =</span> <span class="ot">NA</span>)
+  
+  <span class="co"># latest loss and latest paid loss</span>
+  results<span class="op">$</span>latestLoss &lt;-<span class="st"> </span>devResults[,<span class="kw">paste</span>(<span class="st">&quot;Latest&quot;</span>, triType)]
+  results<span class="op">$</span>latestPaid &lt;-<span class="st"> </span>devResults[,<span class="st">&quot;Latest Paid&quot;</span>]
+  
+  <span class="co"># reported/paid %</span>
+  results<span class="op">$</span>devPct &lt;-<span class="st"> </span><span class="dv">1</span><span class="op">/</span>devResults[,<span class="st">&quot;Age-to-Ult&quot;</span>]
+  
+  <span class="co"># B-F definition of credibility = reported/paid % is not valid</span>
+  <span class="co"># if reported/paid % &gt; 1 i.e. when there is negative development</span>
+  results<span class="op">$</span>devPctMod &lt;-<span class="st"> </span><span class="kw">ifelse</span>(results<span class="op">$</span>devPct <span class="op">&gt;</span><span class="st"> </span><span class="dv">1</span>, <span class="dv">1</span>, results<span class="op">$</span>devPct)
+  
+  <span class="co"># dev/ielr method estimates</span>
+  results<span class="op">$</span>devEst &lt;-<span class="st"> </span>devResults[, <span class="kw">c</span>(<span class="st">&quot;Ultimate Loss&quot;</span>)]
+  results<span class="op">$</span>ielrEst &lt;-<span class="st"> </span>ielrResults[, <span class="kw">c</span>(<span class="st">&quot;IELR Ultimate Loss&quot;</span>)]
+  
+  <span class="co"># calculate B-F ultimate and unpaid loss</span>
+  results<span class="op">$</span>ult &lt;-<span class="st"> </span>results<span class="op">$</span>devEst<span class="op">*</span>results<span class="op">$</span>devPctMod <span class="op">+</span><span class="st"> </span>results<span class="op">$</span>ielrEst<span class="op">*</span>(<span class="dv">1</span><span class="op">-</span>results<span class="op">$</span>devPctMod)
+  results<span class="op">$</span>ult[<span class="kw">nrow</span>(results)] &lt;-<span class="st"> </span><span class="kw">sum</span>(results<span class="op">$</span>ult[<span class="op">-</span><span class="kw">nrow</span>(results)])
+  results<span class="op">$</span>unpaid &lt;-<span class="st"> </span>results<span class="op">$</span>ult <span class="op">-</span><span class="st"> </span>results<span class="op">$</span>latestPaid
+  
+  <span class="co"># set column names</span>
+  <span class="kw">colnames</span>(results) &lt;-<span class="st"> </span><span class="kw">c</span>(<span class="st">&quot;Accident Year&quot;</span>, <span class="st">&quot;Latest Loss&quot;</span>, <span class="st">&quot;Latest Paid&quot;</span>,
+                         <span class="kw">paste</span>(triType, <span class="st">&quot;%&quot;</span>), <span class="kw">paste</span>(triType, <span class="st">&quot;% for B-F&quot;</span>), <span class="st">&quot;Development Method Ultimate&quot;</span>,
+                         <span class="st">&quot;IELR Method Ultimate&quot;</span>, <span class="st">&quot;B-F Ultimate Loss&quot;</span>,
+                         <span class="st">&quot;B-F Unpaid Loss&quot;</span>)
+  
+  <span class="co"># output results</span>
+  <span class="kw">return</span>(results)
+}</code></pre></div>
+</div>
+<div id="bornheutter-ferguson-method-1" class="slide section level1">
+<h1>(5) Bornheutter-Ferguson Method</h1>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># calculate and store B-F method results for insurer 43</span>
+insurer43<span class="op">$</span>paidBF &lt;-<span class="st"> </span><span class="kw">BF</span>(insurer43<span class="op">$</span>paidDev, insurer43<span class="op">$</span>ielr, <span class="st">&quot;Paid&quot;</span>)
+insurer43<span class="op">$</span>rptdBF &lt;-<span class="st"> </span><span class="kw">BF</span>(insurer43<span class="op">$</span>rptdDev, insurer43<span class="op">$</span>ielr, <span class="st">&quot;Reported&quot;</span>)
+insurer43<span class="op">$</span>paidBF</code></pre></div>
+<pre><code>##    Accident Year Latest Loss Latest Paid    Paid % Paid % for B-F
+## 1           1988         614         614 1.0000000      1.0000000
+## 2           1989        2978        2978 1.0000000      1.0000000
+## 3           1990        8762        8762 1.0000000      1.0000000
+## 4           1991       18308       18308 0.9970860      0.9970860
+## 5           1992       27124       27124 0.9897281      0.9897281
+## 6           1993       31249       31249 0.9602551      0.9602551
+## 7           1994       38338       38338 0.9174043      0.9174043
+## 8           1995       31677       31677 0.8143489      0.8143489
+## 9           1996       23446       23446 0.6265771      0.6265771
+## 10          1997       12292       12292 0.2976805      0.2976805
+## 11         Total      194788      194788        NA             NA
+##    Development Method Ultimate IELR Method Ultimate B-F Ultimate Loss
+## 1                       614.00             823.5149            614.00
+## 2                      2978.00            3134.8773           2978.00
+## 3                      8762.00            5418.6359           8762.00
+## 4                     18361.51           15443.4343          18353.00
+## 5                     27405.51           25438.7887          27385.30
+## 6                     32542.39           32331.4702          32534.01
+## 7                     41789.64           39202.0686          41575.92
+## 8                     38898.56           43824.7935          39813.12
+## 9                     37419.18           43180.7037          39570.66
+## 10                    41292.59           47704.0547          45795.49
+## 11                   250063.37          256502.3418         257381.51
+##    B-F Unpaid Loss
+## 1          0.00000
+## 2          0.00000
+## 3          0.00000
+## 4         45.00272
+## 5        261.30426
+## 6       1285.01017
+## 7       3237.92147
+## 8       8136.11953
+## 9      16124.66204
+## 10     33503.48586
+## 11     62593.50606</code></pre>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">insurer43<span class="op">$</span>rptdBF</code></pre></div>
+<pre><code>##    Accident Year Latest Loss Latest Paid Reported % Reported % for B-F
+## 1           1988         614         614  1.0000000          1.0000000
+## 2           1989        2978        2978  1.0000000          1.0000000
+## 3           1990        8765        8762  1.0000000          1.0000000
+## 4           1991       18407       18308  1.0012139          1.0000000
+## 5           1992       27722       27124  1.0092811          1.0000000
+## 6           1993       33722       31249  1.0175445          1.0000000
+## 7           1994       41712       38338  1.0095970          1.0000000
+## 8           1995       42909       31677  1.0201725          1.0000000
+## 9           1996       41304       23446  0.9784728          0.9784728
+## 10          1997       44436       12292  0.8772042          0.8772042
+## 11         Total      262569      194788         NA                 NA
+##    Development Method Ultimate IELR Method Ultimate B-F Ultimate Loss
+## 1                       614.00             823.5149            614.00
+## 2                      2978.00            3134.8773           2978.00
+## 3                      8765.00            5418.6359           8765.00
+## 4                     18384.68           15443.4343          18384.68
+## 5                     27467.08           25438.7887          27467.08
+## 6                     33140.57           32331.4702          33140.57
+## 7                     41315.50           39202.0686          41315.50
+## 8                     42060.53           43824.7935          42060.53
+## 9                     42212.72           43180.7037          42233.56
+## 10                    50656.39           47704.0547          50293.86
+## 11                   267594.47          256502.3418         267252.77
+##    B-F Unpaid Loss
+## 1          0.00000
+## 2          0.00000
+## 3          3.00000
+## 4         76.68307
+## 5        343.07507
+## 6       1891.56630
+## 7       2977.49695
+## 8      10383.53466
+## 9      18787.56171
+## 10     38001.85640
+## 11     72464.77417</code></pre>
+</div>
+<div id="reserve-analysis-for-another-insurer" class="slide section level1">
+<h1>(6) Reserve analysis for another insurer</h1>
+<p>We can use the functions we created to run a quick reserve analysis for another insurer.</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># initializing the list object that represents insurer's reserve analysis</span>
+insurer460 &lt;-<span class="st"> </span><span class="kw">list</span>(<span class="dt">data =</span> <span class="ot">NA</span>)
+<span class="co"># storing compiled data for insurer with GRCODE 460</span>
+insurer460<span class="op">$</span>data &lt;-<span class="st"> </span><span class="kw">compileData</span>(<span class="dt">data =</span> claimsData, <span class="dt">insurerCode =</span> <span class="dv">460</span>)
+<span class="kw">summary</span>(insurer460<span class="op">$</span>data)</code></pre></div>
+<pre><code>##  GRCODE      GRNAME           AccidentDate        TransactionDate     
+##  43 : 0   Length:55          Min.   :1988-01-26   Min.   :1988-04-25  
+##  266: 0   Class :character   1st Qu.:1989-05-19   1st Qu.:1992-11-05  
+##  353: 0   Mode  :character   Median :1991-03-03   Median :1994-09-20  
+##  388: 0                      Mean   :1991-07-11   Mean   :1994-07-11  
+##  460:55                      3rd Qu.:1993-09-03   3rd Qu.:1996-09-29  
+##                              Max.   :1997-05-16   Max.   :1997-12-12  
+##    IncurLoss       CumPaidLoss     EarnedPremNet  PostedReserve97
+##  Min.   : 227.0   Min.   :  60.0   Min.   : 178   Min.   :3316   
+##  1st Qu.: 383.0   1st Qu.: 307.5   1st Qu.: 481   1st Qu.:3316   
+##  Median : 684.0   Median : 559.0   Median :1348   Median :3316   
+##  Mean   : 842.6   Mean   : 562.3   Mean   :1313   Mean   :3316   
+##  3rd Qu.:1096.5   3rd Qu.: 683.5   3rd Qu.:2089   3rd Qu.:3316   
+##  Max.   :2510.0   Max.   :1608.0   Max.   :3466   Max.   :3316   
+##   AccidentYear      DevAge   
+##  Min.   :1988   Min.   : 12  
+##  1st Qu.:1989   1st Qu.: 24  
+##  Median :1991   Median : 48  
+##  Mean   :1991   Mean   : 48  
+##  3rd Qu.:1993   3rd Qu.: 72  
+##  Max.   :1997   Max.   :120</code></pre>
+</div>
+<div id="reserve-analysis-for-another-insurer-1" class="slide section level1">
+<h1>(6) Reserve analysis for another insurer</h1>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># create paid and reported loss triangle</span>
+insurer460<span class="op">$</span>rptdTri &lt;-<span class="st"> </span><span class="kw">createTriangles</span>(insurer460<span class="op">$</span>data, <span class="st">&quot;IncurLoss&quot;</span>, <span class="st">&quot;Reported&quot;</span>)
+insurer460<span class="op">$</span>paidTri &lt;-<span class="st"> </span><span class="kw">createTriangles</span>(insurer460<span class="op">$</span>data, <span class="st">&quot;CumPaidLoss&quot;</span>, <span class="st">&quot;Paid&quot;</span>)
+insurer460<span class="op">$</span>rptdTri</code></pre></div>
+<pre><code>##        12   24   36   48   60  72  84  96 108 120
+## 1988  231  227  242  271  272 272 271 271 271 271
+## 1989  392  291  388  373  378 386 383 383 383  NA
+## 1990  663  742  731  618  684 683 682 682  NA  NA
+## 1991  827  931 1004  794  813 803 793  NA  NA  NA
+## 1992 1181 1027  809  680  680 675  NA  NA  NA  NA
+## 1993 1466 1343 1320 1082 1075  NA  NA  NA  NA  NA
+## 1994 1450 1194 1382 1111   NA  NA  NA  NA  NA  NA
+## 1995 2073 2072 1901   NA   NA  NA  NA  NA  NA  NA
+## 1996 1937 1971   NA   NA   NA  NA  NA  NA  NA  NA
+## 1997 2510   NA   NA   NA   NA  NA  NA  NA  NA  NA</code></pre>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">insurer460<span class="op">$</span>paidTri</code></pre></div>
+<pre><code>##       12   24   36   48   60  72  84  96 108 120
+## 1988  60  174  214  239  268 268 267 267 267 267
+## 1989 137  255  306  344  371 385 385 385 385  NA
+## 1990 270  446  574  656  683 682 681 681  NA  NA
+## 1991 376  549  684  740  791 797 791  NA  NA  NA
+## 1992 309  447  664  680  680 675  NA  NA  NA  NA
+## 1993 432  571  919 1041 1061  NA  NA  NA  NA  NA
+## 1994 388  559  875 1011   NA  NA  NA  NA  NA  NA
+## 1995 757 1299 1608   NA   NA  NA  NA  NA  NA  NA
+## 1996 610 1024   NA   NA   NA  NA  NA  NA  NA  NA
+## 1997 674   NA   NA   NA   NA  NA  NA  NA  NA  NA</code></pre>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># get earned premium for accident years</span>
+accYears &lt;-<span class="st"> </span><span class="kw">sort</span>(<span class="kw">unique</span>(insurer460<span class="op">$</span>data<span class="op">$</span>AccidentYear))
+insurer460<span class="op">$</span>earnPrem &lt;-<span class="st"> </span><span class="kw">sapply</span>(accYears,
+                             <span class="cf">function</span>(x) <span class="kw">unique</span>(insurer460<span class="op">$</span>data<span class="op">$</span>EarnedPremNet[insurer460<span class="op">$</span>data<span class="op">$</span>AccidentYear <span class="op">==</span><span class="st"> </span>x]))
+<span class="co"># totals</span>
+insurer460<span class="op">$</span>earnPrem &lt;-<span class="st"> </span><span class="kw">c</span>(insurer460<span class="op">$</span>earnPrem, <span class="kw">sum</span>(insurer460<span class="op">$</span>earnPrem))
+<span class="co"># add row names</span>
+<span class="kw">names</span>(insurer460<span class="op">$</span>earnPrem) &lt;-<span class="st"> </span><span class="kw">c</span>(accYears, <span class="st">&quot;Total&quot;</span>)
+insurer460<span class="op">$</span>earnPrem</code></pre></div>
+<pre><code>##  1988  1989  1990  1991  1992  1993  1994  1995  1996  1997 Total 
+##   178   481   681  1348  2066  2279  2089  2917  3466  3407 18912</code></pre>
+</div>
+<div id="reserve-analysis-for-another-insurer-2" class="slide section level1">
+<h1>(6) Reserve analysis for another insurer</h1>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># calculate and store dev method results for insurer 460</span>
+<span class="co"># paid dev method</span>
+insurer460<span class="op">$</span>paidDev &lt;-<span class="st"> </span><span class="kw">devMethod</span>(<span class="dt">triangle =</span> insurer460<span class="op">$</span>paidTri,
+                               <span class="dt">paidTri =</span> insurer460<span class="op">$</span>paidTri,
+                               <span class="dt">tail =</span> <span class="dv">1</span>)
+<span class="co"># reported dev method</span>
+insurer460<span class="op">$</span>rptdDev &lt;-<span class="st"> </span><span class="kw">devMethod</span>(<span class="dt">triangle =</span> insurer460<span class="op">$</span>rptdTri,
+                               <span class="dt">paidTri =</span> insurer460<span class="op">$</span>paidTri,
+                               <span class="dt">tail =</span> <span class="dv">1</span>)
+
+insurer460<span class="op">$</span>paidDev</code></pre></div>
+<pre><code>##    Accident Year Latest Paid Latest Paid Age-to-Age Age-to-Ult
+## 1           1988         267         267  1.0000000  1.0000000
+## 2           1989         385         385  1.0000000  1.0000000
+## 3           1990         681         681  1.0000000  1.0000000
+## 4           1991         791         791  1.0000000  1.0000000
+## 5           1992         675         675  0.9962477  0.9962477
+## 6           1993        1061        1061  1.0050125  1.0012414
+## 7           1994        1011        1011  1.0416216  1.0429147
+## 8           1995        1608        1608  1.1121341  1.1598610
+## 9           1996        1024        1024  1.3590698  1.5763320
+## 10          1997         674         674  1.5944894  2.5134445
+## 11         Total        8177        8177         NA         NA
+##    Ultimate Loss Unpaid Loss
+## 1       267.0000    0.000000
+## 2       385.0000    0.000000
+## 3       681.0000    0.000000
+## 4       791.0000    0.000000
+## 5       672.4672   -2.532833
+## 6      1062.3171    1.317101
+## 7      1054.3867   43.386728
+## 8      1865.0564  257.056412
+## 9      1614.1639  590.163923
+## 10     1694.0616 1020.061623
+## 11    10086.4530 1909.452954</code></pre>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">insurer460<span class="op">$</span>rptdDev</code></pre></div>
+<pre><code>##    Accident Year Latest Reported Latest Paid Age-to-Age Age-to-Ult
+## 1           1988             271         267  1.0000000  1.0000000
+## 2           1989             383         385  1.0000000  1.0000000
+## 3           1990             682         681  1.0000000  1.0000000
+## 4           1991             793         791  1.0000000  1.0000000
+## 5           1992             675         675  0.9930037  0.9930037
+## 6           1993            1075        1061  0.9971701  0.9901937
+## 7           1994            1111        1011  1.0220010  1.0119790
+## 8           1995            1901        1608  0.8388359  0.8488843
+## 9           1996            1971        1024  0.9936119  0.8434615
+## 10          1997            2510         674  0.9587084  0.8086337
+## 11         Total           11372        8177         NA         NA
+##    Ultimate Loss Unpaid Loss
+## 1       271.0000    4.000000
+## 2       383.0000   -2.000000
+## 3       682.0000    1.000000
+## 4       793.0000    2.000000
+## 5       670.2775   -4.722481
+## 6      1064.4582    3.458200
+## 7      1124.3086  113.308639
+## 8      1613.7291    5.729123
+## 9      1662.4627  638.462697
+## 10     2029.6705 1355.670529
+## 11    10293.9067 2116.906707</code></pre>
+</div>
+<div id="reserve-analysis-for-another-insurer-3" class="slide section level1">
+<h1>(6) Reserve analysis for another insurer</h1>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># calculate and store IELR method results for insurer 460</span>
+insurer460<span class="op">$</span>ielr &lt;-<span class="st"> </span><span class="kw">IELR</span>(<span class="dt">rptdTri =</span> insurer460<span class="op">$</span>rptdTri, <span class="dt">paidTri =</span> insurer460<span class="op">$</span>paidTri,
+                       <span class="dt">earnPrem =</span> insurer460<span class="op">$</span>earnPrem)
+insurer460<span class="op">$</span>ielr</code></pre></div>
+<pre><code>##       Accident Year Latest Paid Earned Premium Development Method Ultimate
+## 1988           1988         267            178                    269.0000
+## 1989           1989         385            481                    384.0000
+## 1990           1990         681            681                    681.5000
+## 1991           1991         791           1348                    792.0000
+## 1992           1992         675           2066                    671.3723
+## 1993           1993        1061           2279                   1063.3877
+## 1994           1994        1011           2089                   1089.3477
+## 1995           1995        1608           2917                   1739.3928
+## 1996           1996        1024           3466                   1638.3133
+## 1997           1997         674           3407                   1861.8661
+## Total         Total        8177          18912                  10190.1798
+##       Ultimate Loss Ratio Selected Loss Ratio IELR Ultimate Loss
+## 1988            1.5112360            0.476402           84.79956
+## 1989            0.7983368            0.476402          229.14936
+## 1990            1.0007342            0.476402          324.42976
+## 1991            0.5875371            0.476402          642.18990
+## 1992            0.3249624            0.476402          984.24654
+## 1993            0.4666027            0.476402         1085.72016
+## 1994            0.5214685            0.476402          995.20378
+## 1995            0.5962951            0.476402         1389.66464
+## 1996            0.4726813            0.476402         1651.20934
+## 1997            0.5464826            0.476402         1623.10162
+## Total           0.5388208            0.476402         9009.71467
+##       IELR Unpaid Loss
+## 1988        -182.20044
+## 1989        -155.85064
+## 1990        -356.57024
+## 1991        -148.81010
+## 1992         309.24654
+## 1993          24.72016
+## 1994         -15.79622
+## 1995        -218.33536
+## 1996         627.20934
+## 1997         949.10162
+## Total        832.71467</code></pre>
+</div>
+<div id="reserve-analysis-for-another-insurer-4" class="slide section level1">
+<h1>(6) Reserve analysis for another insurer</h1>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># calculate and store B-F method results for insurer 460</span>
+insurer460<span class="op">$</span>paidBF &lt;-<span class="st"> </span><span class="kw">BF</span>(insurer460<span class="op">$</span>paidDev, insurer460<span class="op">$</span>ielr, <span class="st">&quot;Paid&quot;</span>)
+insurer460<span class="op">$</span>rptdBF &lt;-<span class="st"> </span><span class="kw">BF</span>(insurer460<span class="op">$</span>rptdDev, insurer460<span class="op">$</span>ielr, <span class="st">&quot;Reported&quot;</span>)
+insurer460<span class="op">$</span>paidBF</code></pre></div>
+<pre><code>##    Accident Year Latest Loss Latest Paid    Paid % Paid % for B-F
+## 1           1988         267         267 1.0000000      1.0000000
+## 2           1989         385         385 1.0000000      1.0000000
+## 3           1990         681         681 1.0000000      1.0000000
+## 4           1991         791         791 1.0000000      1.0000000
+## 5           1992         675         675 1.0037665      1.0000000
+## 6           1993        1061        1061 0.9987602      0.9987602
+## 7           1994        1011        1011 0.9588512      0.9588512
+## 8           1995        1608        1608 0.8621723      0.8621723
+## 9           1996        1024        1024 0.6343841      0.6343841
+## 10          1997         674         674 0.3978604      0.3978604
+## 11         Total        8177        8177        NA             NA
+##    Development Method Ultimate IELR Method Ultimate B-F Ultimate Loss
+## 1                     267.0000             84.79956          267.0000
+## 2                     385.0000            229.14936          385.0000
+## 3                     681.0000            324.42976          681.0000
+## 4                     791.0000            642.18990          791.0000
+## 5                     672.4672            984.24654          672.4672
+## 6                    1062.3171           1085.72016         1062.3461
+## 7                    1054.3867            995.20378         1051.9514
+## 8                    1865.0564           1389.66464         1799.5343
+## 9                    1614.1639           1651.20934         1627.7083
+## 10                   1694.0616           1623.10162         1651.3338
+## 11                  10086.4530           9009.71467         9989.3411
+##    B-F Unpaid Loss
+## 1         0.000000
+## 2         0.000000
+## 3         0.000000
+## 4         0.000000
+## 5        -2.532833
+## 6         1.346117
+## 7        40.951422
+## 8       191.534264
+## 9       603.708315
+## 10      977.333795
+## 11     1812.341081</code></pre>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">insurer460<span class="op">$</span>rptdBF</code></pre></div>
+<pre><code>##    Accident Year Latest Loss Latest Paid Reported % Reported % for B-F
+## 1           1988         271         267  1.0000000          1.0000000
+## 2           1989         383         385  1.0000000          1.0000000
+## 3           1990         682         681  1.0000000          1.0000000
+## 4           1991         793         791  1.0000000          1.0000000
+## 5           1992         675         675  1.0070456          1.0000000
+## 6           1993        1075        1061  1.0099034          1.0000000
+## 7           1994        1111        1011  0.9881628          0.9881628
+## 8           1995        1901        1608  1.1780168          1.0000000
+## 9           1996        1971        1024  1.1855905          1.0000000
+## 10          1997        2510         674  1.2366539          1.0000000
+## 11         Total       11372        8177         NA                 NA
+##    Development Method Ultimate IELR Method Ultimate B-F Ultimate Loss
+## 1                     271.0000             84.79956          271.0000
+## 2                     383.0000            229.14936          383.0000
+## 3                     682.0000            324.42976          682.0000
+## 4                     793.0000            642.18990          793.0000
+## 5                     670.2775            984.24654          670.2775
+## 6                    1064.4582           1085.72016         1064.4582
+## 7                    1124.3086            995.20378         1122.7804
+## 8                    1613.7291           1389.66464         1613.7291
+## 9                    1662.4627           1651.20934         1662.4627
+## 10                   2029.6705           1623.10162         2029.6705
+## 11                  10293.9067           9009.71467        10292.3785
+##    B-F Unpaid Loss
+## 1         4.000000
+## 2        -2.000000
+## 3         1.000000
+## 4         2.000000
+## 5        -4.722481
+## 6         3.458200
+## 7       111.780402
+## 8         5.729123
+## 9       638.462697
+## 10     1355.670529
+## 11     2115.378470</code></pre>
 </div>
 
   <!-- dynamically load mathjax for compatibility with self-contained -->

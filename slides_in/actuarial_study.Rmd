@@ -3,6 +3,7 @@ title: "Reserve Study"
 output:
   slidy_presentation:
     duration: 60
+  ioslides_presentation: default
 ---
 
 
@@ -14,17 +15,14 @@ output:
 
 # Project Overview
 
-We will estimate reserves for an insurer's claims data set. We will also define functions to make our code reusable for another insurer. 
+We will estimate reserves for an insurer's claims data set. At every step below, we will store the results in a list object which represents our reserve analysis of the insurer. We will also define functions to make our code reusable for another insurer. 
 
-* Part 1 - Load in claims data as data frame  
-* Part 2 - Generate triangles as matrices  
-* Part 3 - Generate some sample diagnostics  
-* Part 4 - Development method  
-* Part 5 - IELR method  
-* Part 6 - B-F method  
-* Part 7 - Make a list object storing results from parts 1-6 above  
-* Part 8 - Output exhibits in excel  
-* Part 9 - Run parts 1-7 on another insurer claims data set using defined functions
+* Part 1 - Load in Claims Data  
+* Part 2 - Create Loss Triangles  
+* Part 3 - Development Method  
+* Part 4 - Initial Expected Loss Ratio method  
+* Part 5 - Bornhuetter Ferguson Method  
+* Part 6 - Reserve Analysis for another insurer  
 
 
 # (1) Load in Claims Data
@@ -46,6 +44,7 @@ summary(claimsData$GRCODE)
 claimsData43 <- subset(claimsData, GRCODE == 43)
 ```
 
+# (1) Load in Claims Data
 
 ## The origin trick
 
@@ -58,42 +57,400 @@ claimsData43$AccidentDate <- as.Date(claimsData43$AccidentDate,
 claimsData43$TransactionDate <- as.Date(claimsData43$TransactionDate,
                                         origin = "1899-12-30")
 summary(claimsData43[, c("AccidentDate", "TransactionDate")])
-```
 
-# (2) Create loss triangles
-
-Our loss triangles will be 10x10 matrices with 2 dimensions - accident year and development age (in months)
-
-```{r}
-# create triangle matrices
-accYears <- 1988:(1988+10-1)
-devAges <- 12*c(1:10)
-paidTri <- matrix(nrow = 10, ncol = 10,
-                  dimnames = list(accYears, devAges))
-incTri <- paidTri
-```
-
-```{r}
-# create columns for accident years and development ages
+# Calculate accident years and development ages
 library(lubridate)
 claimsData43$AccidentYear <- year(claimsData43$AccidentDate)
 claimsData43$DevAge <- 12*(year(claimsData43$TransactionDate)-
-                             year(claimsData43$AccidentDate)+1)
+                          year(claimsData43$AccidentDate)+1)
+```
 
-# sort first by accident year and then by development age
-claimsData43 <- claimsData43[order(claimsData43$AccidentYear,
-                                   claimsData43$DevAge),]
+# (1) Load in Claims Data
 
-# create cumulative loss triangles
+Creating a function to compile data.
+
+```{r}
+# The function will take in 2 arguments
+# data: claims data for all insurers
+# insurerCode: the GR code of insurer that we want to analyze
+compileData <- function(data, insurerCode){
+  library(lubridate)
+  # GRCODE represents the code assigned to individual insurers by NAIC
+  data$GRCODE <- as.factor(data$GRCODE)
+
+  # Let's analyze insurer with GRCODE = insurerCode
+  insurerData <- subset(data, GRCODE == insurerCode)
+  
+  # Convert columns to date
+  insurerData$AccidentDate <- as.Date(insurerData$AccidentDate,
+                                      origin = "1899-12-30")
+  insurerData$TransactionDate <- as.Date(insurerData$TransactionDate,
+                                         origin = "1899-12-30")
+  
+  # Calculate accident years and development ages
+  insurerData$AccidentYear <- year(insurerData$AccidentDate)
+  insurerData$DevAge <- 12*(year(insurerData$TransactionDate)-
+                            year(insurerData$AccidentDate)+1)
+  
+  # Output compiled data
+  return(insurerData)
+}
+```
+
+# (1) Load in Claims Data
+
+Creating an insurer list object.
+
+```{r}
+# initializing the list object that represents insurer's reserve analysis
+insurer43 <- list(data = NA)
+# storing compiled data for insurer with GRCODE 43
+insurer43$data <- compileData(data = claimsData, insurerCode = 43)
+summary(insurer43$data)
+```
+
+# (2) Create triangles
+
+Our loss triangles will be 10x10 matrices with 2 dimensions - accident year and development age (in months).
+
+```{r}
+# create paid triangle matrix
+accYears <- sort(unique(insurer43$data$AccidentYear))
+devAges <- sort(unique(insurer43$data$DevAge))
+paidTri <- matrix(nrow = length(accYears), ncol = length(devAges),
+                  dimnames = list(accYears, devAges))
+
+# create cumulative paid loss triangle
 for(i in 1:length(accYears)){
   for(j in 1:(length(devAges)-i+1)){
-    paidTri[i,j] <- as.numeric(subset(claimsData43,
+    paidTri[i,j] <- as.numeric(subset(insurer43$data,
                                      AccidentYear == accYears[i] & DevAge == devAges[j],
                                      CumPaidLoss))
-    incTri[i,j] <- as.numeric(subset(claimsData43,
-                                     AccidentYear == accYears[i] & DevAge == devAges[j],
-                                     IncurLoss))
+    
   }
 }
+paidTri
+```
+
+# (2) Create triangles
+
+Create a function to process triangles.
+
+```{r}
+# create function to create triangles
+createTriangles <- function(data, triColName, triType){
+  # create triangle matrix
+  accYears <- sort(unique(data$AccidentYear))
+  devAges <- sort(unique(data$DevAge))
+  tri <- matrix(nrow = length(accYears), ncol = length(devAges),
+                dimnames = list(accYears, devAges))
+  
+  # a matrix has different attributes
+  # you can add a comment using the comment attribute
+  # add comment on type of triangle
+  comment(tri) <- triType
+  
+  # create cumulative paid loss triangle
+  for(i in 1:length(accYears)){
+    for(j in 1:(length(devAges)-i+1)){
+      tri[i,j] <- as.numeric(subset(data,
+                                    AccidentYear == accYears[i] & DevAge == devAges[j],
+                                    triColName))
+      
+    }
+  }
+  
+  return(tri)
+}
+
+# paid and reported loss triangle
+insurer43$rptdTri <- createTriangles(insurer43$data, "IncurLoss", "Reported")
+insurer43$paidTri <- createTriangles(insurer43$data, "CumPaidLoss", "Paid")
+insurer43$rptdTri
+insurer43$paidTri
+```
+
+# (2) Create triangles
+
+Get and store earned premium data.
+
+```{r}
+# get earned premium for accident years
+accYears <- sort(unique(insurer43$data$AccidentYear))
+insurer43$earnPrem <- sapply(accYears,
+                             function(x) unique(insurer43$data$EarnedPremNet[insurer43$data$AccidentYear == x]))
+# totals
+insurer43$earnPrem <- c(insurer43$earnPrem, sum(insurer43$earnPrem))
+# add row names
+names(insurer43$earnPrem) <- c(accYears, "Total")
+insurer43$earnPrem
+```
+
+# (3) Development Method
+
+```{r}
+# Chainladder development method
+# Arguments:
+# triangle = triangle matrix object to run the development method on
+# paidTri = paid loss triangle matrix object to get unpaid loss
+# tail = tail factor to use in development method
+#      = (optional) argument with default value 1
+devMethod <- function(triangle, paidTri, tail=1){
+  # data frame to store dev method results
+  results <- data.frame(accYear = c(row.names(triangle), "Total"),
+                        latestLoss = NA, latestPaid = NA,
+                        ata = NA, atu = NA, ult = NA, unpaid = NA)
+  
+  # ATA/ATU for oldest year will be our tail factor
+  results$ata[1] <- tail
+  results$atu[1] <- tail
+  
+  # latest loss for oldest year
+  results$latestLoss[1] <- triangle[1, ncol(triangle)]
+  # latest paid loss for oldest year
+  results$latestPaid[1] <- paidTri[1, ncol(paidTri)]
+  
+  # calculate ATA/ATU for remaining years
+  for(j in seq(ncol(triangle), 2, -1)){
+    # calculate position of latest AY for dev age j
+    i <- nrow(triangle) - j + 1 
+    # ATA for AY i+1 from age j-1 to j (all year weighted average)
+    results$ata[i+1] <- sum(triangle[1:i,j])/sum(triangle[1:i,j-1])
+    # ATU for AY i+1 from age j-1 to ult
+    results$atu[i+1] <- results$atu[i]*results$ata[i+1]
+    # latest loss for AY i+1
+    results$latestLoss[i+1] <- triangle[i+1, j-1]
+    # latest paid loss for AY i+1
+    results$latestPaid[i+1] <- paidTri[i+1, j-1]
+  }
+  
+  # ultimate loss
+  results$ult <- results$latestLoss*results$atu
+  # unpaid loss
+  results$unpaid <- results$ult - results$latestPaid
+  
+  # totals
+  results[nrow(results), c(2:3, 6:7)] <- sapply(c(2:3, 6:7),
+                                                function(x) sum(results[-nrow(results), x]))
+  
+  # set column names
+  colnames(results) <- c("Accident Year", paste("Latest", comment(triangle)),
+                         "Latest Paid", "Age-to-Age", "Age-to-Ult",
+                         "Ultimate Loss", "Unpaid Loss")
+  
+  # output results
+  return(results)
+}
+```
+
+# (3) Development Method
+
+```{r}
+# calculate and store dev method results for insurer 43
+# paid dev method
+insurer43$paidDev <- devMethod(triangle = insurer43$paidTri,
+                               paidTri = insurer43$paidTri,
+                               tail = 1)
+# reported dev method
+insurer43$rptdDev <- devMethod(triangle = insurer43$rptdTri,
+                               paidTri = insurer43$paidTri,
+                               tail = 1)
+
+insurer43$paidDev
+insurer43$rptdDev
+```
+
+# (4) Initial Expected Loss Ratio
+
+```{r}
+# IELR method
+# Arguments:
+# rptdTri = reported loss triangle
+# paidTri = paid loss triangle
+# earnPrem = earned premium
+# tail = tail factor to develop losses
+# ultType = 0 to use average of rptd and paid developed losses
+#         = 1 to use rptd developed losses
+#         = 2 to use paid developed losses
+# nyears = number of recent years to include in IELR straight average
+# excludeYears = number of recent years to exclude in IELR straight average
+IELR <- function(rptdTri, paidTri, earnPrem, tail=1, ultType = 0, nyears=5, excludeYears=1){
+  # data frame to store ielr method results
+  results <- data.frame(accYear = names(earnPrem),
+                        latestPaid = NA, earnPrem = earnPrem,
+                        devLoss = NA, ultLR = NA, selLR = NA,
+                        ult = NA, unpaid = NA)
+  
+  # get developed loss using CL method
+  rptdDev <- devMethod(triangle = rptdTri, paidTri = paidTri,
+                       tail = tail)
+  paidDev <- devMethod(triangle = paidTri, paidTri = paidTri,
+                       tail = tail)
+  if(ultType == 0){
+    results$devLoss <- (rptdDev[,c("Ultimate Loss")] + paidDev[,c("Ultimate Loss")])/2
+  } else if(ultType == 1){
+    results$devLoss <- rptdDev[,c("Ultimate Loss")]
+  } else{
+    results$devLoss <- paidDev[,c("Ultimate Loss")]
+  }
+  
+  
+  # store latest loss, latest paid loss and earned premium
+  results$latestPaid <- paidDev[, c("Latest Paid")]
+  
+  # calculate ultimate loss ratio
+  results$ultLR <- results$devLoss / results$earnPrem
+  
+  # selected loss ratio as straight average of nyears LR
+  ## calculate position of latest AY to include in IELR calculation
+  latestAYPos <- nrow(results)-1-excludeYears
+  results$selLR <- mean(results$ultLR[seq(latestAYPos-nyears+1, latestAYPos)])
+  
+  # ultimate and unpaid loss
+  results$ult <- results$earnPrem * results$selLR
+  results$unpaid <- results$ult - results$latestPaid
+  
+  # set column names
+  colnames(results) <- c("Accident Year", "Latest Paid", "Earned Premium",
+                         "Development Method Ultimate", "Ultimate Loss Ratio", "Selected Loss Ratio",
+                         "IELR Ultimate Loss", "IELR Unpaid Loss")
+  
+  # output results
+  return(results)
+}
+```
+
+# (4) Initial Expected Loss Ratio
+
+```{r}
+# calculate and store IELR method results for insurer 43
+insurer43$ielr <- IELR(rptdTri = insurer43$rptdTri, paidTri = insurer43$paidTri,
+                       earnPrem = insurer43$earnPrem)
+insurer43$ielr
+```
+
+# (5) Bornheutter-Ferguson Method
+
+```{r}
+# B-F Method
+# Arguments:
+# devResults = data frame object with development method results
+# ielrResults = data frame object with IELR method results
+# triType = "Paid" to use paid development patterns
+#         = "Reported" to use reported development patterns
+BF <- function(devResults, ielrResults, triType){
+  # data frame to store ielr method results
+  results <- data.frame(accYear = devResults$`Accident Year`,
+                        latestLoss = NA, latestPaid = NA,
+                        devPct = NA, devPctMod = NA, devEst = NA, ielrEst = NA,
+                        ult = NA, unpaid = NA)
+  
+  # latest loss and latest paid loss
+  results$latestLoss <- devResults[,paste("Latest", triType)]
+  results$latestPaid <- devResults[,"Latest Paid"]
+  
+  # reported/paid %
+  results$devPct <- 1/devResults[,"Age-to-Ult"]
+  
+  # B-F definition of credibility = reported/paid % is not valid
+  # if reported/paid % > 1 i.e. when there is negative development
+  results$devPctMod <- ifelse(results$devPct > 1, 1, results$devPct)
+  
+  # dev/ielr method estimates
+  results$devEst <- devResults[, c("Ultimate Loss")]
+  results$ielrEst <- ielrResults[, c("IELR Ultimate Loss")]
+  
+  # calculate B-F ultimate and unpaid loss
+  results$ult <- results$devEst*results$devPctMod + results$ielrEst*(1-results$devPctMod)
+  results$ult[nrow(results)] <- sum(results$ult[-nrow(results)])
+  results$unpaid <- results$ult - results$latestPaid
+  
+  # set column names
+  colnames(results) <- c("Accident Year", "Latest Loss", "Latest Paid",
+                         paste(triType, "%"), paste(triType, "% for B-F"), "Development Method Ultimate",
+                         "IELR Method Ultimate", "B-F Ultimate Loss",
+                         "B-F Unpaid Loss")
+  
+  # output results
+  return(results)
+}
+```
+
+# (5) Bornheutter-Ferguson Method
+
+```{r}
+# calculate and store B-F method results for insurer 43
+insurer43$paidBF <- BF(insurer43$paidDev, insurer43$ielr, "Paid")
+insurer43$rptdBF <- BF(insurer43$rptdDev, insurer43$ielr, "Reported")
+insurer43$paidBF
+insurer43$rptdBF
+```
+
+# (6) Reserve analysis for another insurer
+
+We can use the functions we created to run a quick reserve analysis for another insurer.
+
+```{r}
+# initializing the list object that represents insurer's reserve analysis
+insurer460 <- list(data = NA)
+# storing compiled data for insurer with GRCODE 460
+insurer460$data <- compileData(data = claimsData, insurerCode = 460)
+summary(insurer460$data)
+```
+
+# (6) Reserve analysis for another insurer
+
+```{r}
+# create paid and reported loss triangle
+insurer460$rptdTri <- createTriangles(insurer460$data, "IncurLoss", "Reported")
+insurer460$paidTri <- createTriangles(insurer460$data, "CumPaidLoss", "Paid")
+insurer460$rptdTri
+insurer460$paidTri
+
+# get earned premium for accident years
+accYears <- sort(unique(insurer460$data$AccidentYear))
+insurer460$earnPrem <- sapply(accYears,
+                             function(x) unique(insurer460$data$EarnedPremNet[insurer460$data$AccidentYear == x]))
+# totals
+insurer460$earnPrem <- c(insurer460$earnPrem, sum(insurer460$earnPrem))
+# add row names
+names(insurer460$earnPrem) <- c(accYears, "Total")
+insurer460$earnPrem
+```
+
+# (6) Reserve analysis for another insurer
+
+```{r}
+# calculate and store dev method results for insurer 460
+# paid dev method
+insurer460$paidDev <- devMethod(triangle = insurer460$paidTri,
+                               paidTri = insurer460$paidTri,
+                               tail = 1)
+# reported dev method
+insurer460$rptdDev <- devMethod(triangle = insurer460$rptdTri,
+                               paidTri = insurer460$paidTri,
+                               tail = 1)
+
+insurer460$paidDev
+insurer460$rptdDev
+```
+
+# (6) Reserve analysis for another insurer
+
+```{r}
+# calculate and store IELR method results for insurer 460
+insurer460$ielr <- IELR(rptdTri = insurer460$rptdTri, paidTri = insurer460$paidTri,
+                       earnPrem = insurer460$earnPrem)
+insurer460$ielr
+```
+
+# (6) Reserve analysis for another insurer
+
+```{r}
+# calculate and store B-F method results for insurer 460
+insurer460$paidBF <- BF(insurer460$paidDev, insurer460$ielr, "Paid")
+insurer460$rptdBF <- BF(insurer460$rptdDev, insurer460$ielr, "Reported")
+insurer460$paidBF
+insurer460$rptdBF
 ```
 
