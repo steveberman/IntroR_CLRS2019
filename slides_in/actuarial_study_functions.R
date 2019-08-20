@@ -1,76 +1,3 @@
----
-title: "Reserve Study"
-output:
-  slidy_presentation:
-    duration: 60
-  ioslides_presentation: default
----
-
-
-```{r setup, include=FALSE}
-# knitr::opts_knit$set(root.dir = '~/GitHub/IntroR_CLRS2019')
-```
-
-
-
-# Project Overview
-
-We will estimate reserves for an insurer's claims data set. At every step below, we will store the results in a list object which represents our reserve analysis of the insurer. We will also define functions to make our code reusable for another insurer. 
-
-* Part 1 - Loading Claims Data  
-* Part 2 - Data Aggregation 
-* Part 3 - Development Method  
-* Part 4 - Initial Expected Loss Ratio method  
-* Part 5 - Bornhuetter Ferguson Method  
-* Part 6 - Your Turn
-* Part 7 - Extra Credit!
-
-
-# (1) Loading Claims Data
-
-```{r }
-claimsData <- read.csv("~/GitHub/IntroR_CLRS2019/slides_in/ppauto_pos_clean.csv",
-                       stringsAsFactors = FALSE)
-class(claimsData)
-summary(claimsData)
-```
-
-
-```{r}
-# GRCODE represents the code assigned to individual insurers by NAIC
-claimsData$GRCODE <- as.factor(claimsData$GRCODE)
-summary(claimsData$GRCODE)
-
-# Let's analyze insurer with GRCODE 43
-claimsData43 <- subset(claimsData, GRCODE == 43)
-```
-
-# (1) Loading Claims Data
-
-## The origin trick
-
-From the summary, you can see that the accident and transaction dates were read as integers. To convert it to date in R, we need to know the origin date which in Excel is December 30, 1899.
-
-```{r }
-# Convert columns to date
-claimsData43$AccidentDate <- as.Date(claimsData43$AccidentDate,
-                                     origin = "1899-12-30")
-claimsData43$TransactionDate <- as.Date(claimsData43$TransactionDate,
-                                        origin = "1899-12-30")
-summary(claimsData43[, c("AccidentDate", "TransactionDate")])
-
-# Calculate accident years and development ages
-library(lubridate)
-claimsData43$AccidentYear <- year(claimsData43$AccidentDate)
-claimsData43$DevAge <- 12*(year(claimsData43$TransactionDate)-
-                          year(claimsData43$AccidentDate)+1)
-```
-
-# (1) Loading Claims Data
-
-Creating a function to compile data.
-
-```{r}
 # The function will take in 2 arguments
 # data: claims data for all insurers
 # insurerCode: the GR code of insurer that we want to analyze
@@ -78,7 +5,7 @@ compileData <- function(data, insurerCode){
   library(lubridate)
   # GRCODE represents the code assigned to individual insurers by NAIC
   data$GRCODE <- as.factor(data$GRCODE)
-
+  
   # Let's analyze insurer with GRCODE = insurerCode
   insurerData <- subset(data, GRCODE == insurerCode)
   
@@ -91,53 +18,12 @@ compileData <- function(data, insurerCode){
   # Calculate accident years and development ages
   insurerData$AccidentYear <- year(insurerData$AccidentDate)
   insurerData$DevAge <- 12*(year(insurerData$TransactionDate)-
-                            year(insurerData$AccidentDate)+1)
+                              year(insurerData$AccidentDate)+1)
   
   # Output compiled data
   return(insurerData)
 }
-```
 
-# (1) Loading Claims Data
-
-Creating an insurer list object.
-
-```{r}
-# initializing the list object that represents insurer's reserve analysis
-insurer43 <- list(data = NA)
-# storing compiled data for insurer with GRCODE 43
-insurer43$data <- compileData(data = claimsData, insurerCode = 43)
-summary(insurer43$data)
-```
-
-# (2) Data Aggregation
-
-Our loss triangles will be 10x10 matrices with 2 dimensions - accident year and development age (in months).
-
-```{r}
-# create paid triangle matrix
-accYears <- sort(unique(insurer43$data$AccidentYear))
-devAges <- sort(unique(insurer43$data$DevAge))
-paidTri <- matrix(nrow = length(accYears), ncol = length(devAges),
-                  dimnames = list(accYears, devAges))
-
-# create cumulative paid loss triangle
-for(i in 1:length(accYears)){
-  for(j in 1:(length(devAges)-i+1)){
-    paidTri[i,j] <- as.numeric(subset(insurer43$data,
-                                     AccidentYear == accYears[i] & DevAge == devAges[j],
-                                     CumPaidLoss))
-    
-  }
-}
-paidTri
-```
-
-# (2) Data Aggregation
-
-Create a function to process triangles.
-
-```{r}
 # create function to create triangles
 createTriangles <- function(data, triColName, triType){
   # create triangle matrix
@@ -164,18 +50,6 @@ createTriangles <- function(data, triColName, triType){
   return(tri)
 }
 
-# paid and reported loss triangle
-insurer43$rptdTri <- createTriangles(insurer43$data, "IncurLoss", "Reported")
-insurer43$paidTri <- createTriangles(insurer43$data, "CumPaidLoss", "Paid")
-insurer43$rptdTri
-insurer43$paidTri
-```
-
-# (2) Data Aggregation
-
-Get and store earned premium data.
-
-```{r}
 # create function to get earned premium
 getEarnPrem <- function(data){
   # get earned premium for accident years
@@ -189,13 +63,7 @@ getEarnPrem <- function(data){
   # output
   earnPrem  
 }
-insurer43$earnPrem <- getEarnPrem(insurer43$data)
-insurer43$earnPrem
-```
 
-# (3) Development Method
-
-```{r}
 # Chainladder development method
 # Arguments:
 # triangle = triangle matrix object to run the development method on
@@ -236,7 +104,7 @@ devMethod <- function(triangle, paidTri, tail=1, wtdAvg=rep(FALSE, ncol(triangle
     if(wtdAvg[j-1]){
       # all year weighted average ATA
       results$ata[i+1] <- sum(ataTri[start:end,j-1]*triangle[start:end,j-1]) /
-                          sum(triangle[start:end,j-1])
+        sum(triangle[start:end,j-1])
     } else{
       # all year straight average ATA
       results$ata[i+1] <- mean(ataTri[start:end,j-1])
@@ -267,28 +135,7 @@ devMethod <- function(triangle, paidTri, tail=1, wtdAvg=rep(FALSE, ncol(triangle
   # output results
   return(results)
 }
-```
 
-# (3) Development Method
-
-```{r}
-# calculate and store dev method results for insurer 43
-# paid dev method
-insurer43$paidDev <- devMethod(triangle = insurer43$paidTri,
-                               paidTri = insurer43$paidTri,
-                               tail = 1)
-# reported dev method
-insurer43$rptdDev <- devMethod(triangle = insurer43$rptdTri,
-                               paidTri = insurer43$paidTri,
-                               tail = 1)
-
-insurer43$paidDev
-insurer43$rptdDev
-```
-
-# (4) Initial Expected Loss Ratio
-
-```{r}
 # IELR method
 # Arguments:
 # rptdDev = data frame object with reported development method results
@@ -312,7 +159,7 @@ IELR <- function(rptdDev, paidDev, earnPrem, rptdWt = 0.5, nyears=5, excludeYear
   
   # get weighted ultimate losses for IELR
   results$devLoss <- rptdWt*rptdDev[,c("Ultimate Loss")] + 
-                      (1-rptdWt)*paidDev[,c("Ultimate Loss")]
+    (1-rptdWt)*paidDev[,c("Ultimate Loss")]
   
   
   # store latest loss, latest paid loss and earned premium
@@ -338,20 +185,7 @@ IELR <- function(rptdDev, paidDev, earnPrem, rptdWt = 0.5, nyears=5, excludeYear
   # output results
   return(results)
 }
-```
 
-# (4) Initial Expected Loss Ratio
-
-```{r}
-# calculate and store IELR method results for insurer 43
-insurer43$ielr <- IELR(rptdDev = insurer43$rptdDev, paidDev = insurer43$paidDev,
-                       earnPrem = insurer43$earnPrem)
-insurer43$ielr
-```
-
-# (5) Bornheutter-Ferguson Method
-
-```{r}
 # B-F Method
 # Arguments:
 # devResults = data frame object with development method results
@@ -394,41 +228,3 @@ BF <- function(devResults, ielrResults, triType){
   # output results
   return(results)
 }
-```
-
-# (5) Bornheutter-Ferguson Method
-
-```{r}
-# calculate and store B-F method results for insurer 43
-insurer43$paidBF <- BF(insurer43$paidDev, insurer43$ielr, "Paid")
-insurer43$rptdBF <- BF(insurer43$rptdDev, insurer43$ielr, "Reported")
-insurer43$paidBF
-insurer43$rptdBF
-```
-
-# (6) Your turn
-
-Use the functions we created to run a reserve analysis for another insurer. As a reference point, insurers are represented by the GRCODE variable in our claims data set. Following are the different GRCODEs you can use:
-
-```{r}
-unique(claimsData$GRCODE)
-```
-
-For your reference, following are the functions we created:
-
-**_compileData(data, insurerCode)_**  
-**_createTriangles(data, triColName, triType)_**  
-**_getEarnPrem(data)_**  
-**_devMethod(triangle, paidTri, tail, wtdAvg)_**  
-    where _tail_ and _wtdAvg_ are optional arguments  
-**_IELR(rptdDev, paidDev, earnPrem, rptdWt, nyears, excludeYears)_**  
-    where _rptdWt, nyears, excludeYears_ are optional arguments  
-**_BF(devResults, ielrResults, triType)_**  
-
-# (7) Extra Credit!
-
-If you are feeling overly ambitious today and want to improve your LDF selections, modify the devMethod() function we created to take in an argument nyearAvg, which would be a vector representing the number of recent years to include to get your LDF average for every development age.
-
-For example, for a 10x10 triangle, nyearAvg would be a 1x9 numeric vector. If the first element of the vector is 5, the devMethod() function would calculate a 5-year average of 12-24 month ATAs.
-
-Hint: In our function, you need to vary the start variable by the nyearAvg argument.
