@@ -74,6 +74,7 @@ Creating a function to compile data.
 # The function will take in 2 arguments
 # data: claims data for all insurers
 # insurerCode: the GR code of insurer that we want to analyze
+# return: filtered dataset, with additional fields for triangle creation
 compileData <- function(data, insurerCode){
   library(lubridate)
   # GRCODE represents the code assigned to individual insurers by NAIC
@@ -130,7 +131,7 @@ for(i in 1:length(accYears)){
     
   }
 }
-paidTri
+print(paidTri, na.print='')
 ```
 
 # (2) Data Aggregation
@@ -166,9 +167,10 @@ createTriangles <- function(data, triColName, triType){
 
 # paid and reported loss triangle
 insurer43$rptdTri <- createTriangles(insurer43$data, "IncurLoss", "Reported")
+print(insurer43$rptdTri, na.print='')
+
 insurer43$paidTri <- createTriangles(insurer43$data, "CumPaidLoss", "Paid")
-insurer43$rptdTri
-insurer43$paidTri
+print(insurer43$paidTri, na.print='')
 ```
 
 # (2) Data Aggregation
@@ -204,13 +206,16 @@ insurer43$earnPrem
 #         = tail factor to use in development method
 # wtdAvg (optional, default value is not to use wtdAvg)
 #         = boolean vector indicating use of weighted averages for each dev age
+# Return:
+#   list of results, including A-A vector, A-U vector, loss to date, 
 devMethod <- function(triangle, paidTri, tail=1, wtdAvg=rep(FALSE, ncol(triangle)-1)){
   # data frame to store dev method results
   results <- data.frame(accYear = c(row.names(triangle), "Total"),
                         latestLoss = NA, latestPaid = NA,
                         ata = NA, atu = NA, ult = NA, unpaid = NA)
   
-  # create ATA triangle
+  # create ATA triangle using apply family function - this applies a function to a list
+  #   of items without a loop
   ataTri <- sapply(2:ncol(triangle),
                    function(x) triangle[,x]/triangle[,x-1])
   row.names(ataTri) <- row.names(triangle)
@@ -225,7 +230,7 @@ devMethod <- function(triangle, paidTri, tail=1, wtdAvg=rep(FALSE, ncol(triangle
   # latest paid loss for oldest year
   results$latestPaid[1] <- paidTri[1, ncol(paidTri)]
   
-  # calculate ATA/ATU for remaining years
+  # calculate ATA/ATU for remaining years, from oldest to least mature
   for(j in seq(ncol(triangle), 2, -1)){
     # calculate position of latest AY for dev age j
     i <- nrow(triangle) - j + 1 
@@ -255,7 +260,7 @@ devMethod <- function(triangle, paidTri, tail=1, wtdAvg=rep(FALSE, ncol(triangle
   # unpaid loss
   results$unpaid <- results$ult - results$latestPaid
   
-  # totals
+  # totals row - sums everything but last row (only for to-date and ultimate columns)
   results[nrow(results), c(2:3, 6:7)] <- sapply(c(2:3, 6:7),
                                                 function(x) sum(results[-nrow(results), x]))
   
