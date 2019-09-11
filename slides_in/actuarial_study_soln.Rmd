@@ -17,7 +17,7 @@ claimsData <- read.csv("~/GitHub/IntroR_CLRS2019/slides_in/ppauto_pos_clean.csv"
 source("actuarial_study_functions.R")
 ```
 
-# (6) Your turn
+# (7) Your turn
 
 Use the functions we created to run a reserve analysis for another insurer. As a reference point, insurers are represented by the GRCODE variable in our claims data set. Following are the different GRCODEs you can use:
 
@@ -30,13 +30,17 @@ For your reference, following are the functions we created:
 **_compileData(data, insurerCode)_**  
 **_createTriangles(data, triColName, triType)_**  
 **_getEarnPrem(data)_**  
+**_lastDiag(tri)_**  
+**_ataTri(tri)_**  
+**_avgStr(aaTri)_**  
+**_avgWtd(tri)_**  
 **_devMethod(triangle, paidTri, tail, wtdAvg)_**  
     where _tail_ and _wtdAvg_ are optional arguments  
 **_IELR(rptdDev, paidDev, earnPrem, rptdWt, nyears, excludeYears)_**  
     where _rptdWt, nyears, excludeYears_ are optional arguments  
 **_BF(devResults, ielrResults, triType)_**  
 
-# (6) Your turn
+# (7) Your turn
 
 We can use the functions we created to run a quick reserve analysis for another insurer.
 
@@ -48,7 +52,7 @@ insurer460$data <- compileData(data = claimsData, insurerCode = 460)
 summary(insurer460$data)
 ```
 
-# (6) Your turn
+# (7) Your turn
 
 ```{r}
 # create paid and reported loss triangle
@@ -62,7 +66,7 @@ insurer460$earnPrem <- getEarnPrem(insurer460$data)
 insurer460$earnPrem
 ```
 
-# (6) Your turn
+# (7) Your turn
 
 ```{r}
 # calculate and store dev method results for insurer 460
@@ -79,7 +83,7 @@ insurer460$paidDev
 insurer460$rptdDev
 ```
 
-# (6) Your turn
+# (7) Your turn
 
 ```{r}
 # calculate and store IELR method results for insurer 460
@@ -88,7 +92,7 @@ insurer460$ielr <- IELR(rptdDev = insurer460$rptdDev, paidDev = insurer460$paidD
 insurer460$ielr
 ```
 
-# (6) Your turn
+# (7) Your turn
 
 ```{r}
 # calculate and store B-F method results for insurer 460
@@ -98,7 +102,7 @@ insurer460$paidBF
 insurer460$rptdBF
 ```
 
-# (7) Extra Credit!
+# (8) Extra Credit!
 
 If you are feeling overly ambitious today and want to improve your LDF selections, modify the devMethod() function we created to take in an argument nyearAvg, which would be a vector representing the number of recent years to include to get your LDF average for every development age.
 
@@ -109,74 +113,66 @@ Hint: In our function, you need to vary the start variable by the nyearAvg argum
 # (7) Extra Credit!
 
 ```{r}
+### function: avgStr
+### purpose: get unweighted A-A all year avg
+### arguments: aaTri = age-to-age triangle matrix object
+avgStr <- function(aaTri) {
+  apply(aaTri, MARGIN=2, FUN=mean, na.rm=TRUE)
+}
+
+### function: avgWtd
+### purpose: get weighted A-A all year avg
+### arguments: tri = triangle matrix object
+avgWtd <- function(tri) {
+  aa <- ataTri(tri)
+  tri_x_last <- tri[, 1:(ncol(tri)-1)]
+  wtd <- aa * tri_x_last
+  # mask for values to consider
+  wtd_cell <- (!is.na(wtd))*1
+  return(apply(wtd, MARGIN=2, FUN=sum, na.rm=TRUE) / 
+           apply(wtd_cell * tri_x_last, MARGIN=2, FUN=sum, na.rm=TRUE))
+}
+
 # Chainladder development method
 # Arguments:
 # triangle = triangle matrix object to run the development method on
 # paidTri = paid loss triangle matrix object to get unpaid loss
 # tail (optional, default value = 1)
 #         = tail factor to use in development method
-# wtdAvg (optional, default value is not to use straight average)
+# wtdAvg (optional, default value is not to use wtdAvg)
 #         = boolean vector indicating use of weighted averages for each dev age
-# nyearAvg (optional, default value is not to use all years)
-#         = numeric vector giving the number of recent years to include
-#           to get your LDF average for every development age
-devMethod <- function(triangle, paidTri, tail=1, wtdAvg=rep(FALSE, ncol(triangle)-1),
-                      nyearAvg=rep(nrow(triangle)-1, ncol(triangle)-1)){
+# Return:
+#   list of results, including A-A vector, A-U vector, loss to date, 
+devMethod <- function(triangle, paidTri, tail=1, wtdAvg=rep(FALSE, ncol(triangle))){
   # data frame to store dev method results
   results <- data.frame(accYear = c(row.names(triangle), "Total"),
                         latestLoss = NA, latestPaid = NA,
                         ata = NA, atu = NA, ult = NA, unpaid = NA)
   
+  # get latest triangle losses and paid losses
+  results$latestLoss <- c(lastDiag(triangle), NA)
+  results$latestPaid <- c(lastDiag(paidTri), NA)
+  
   # create ATA triangle
-  ataTri <- sapply(2:ncol(triangle),
-                   function(x) triangle[,x]/triangle[,x-1])
-  row.names(ataTri) <- row.names(triangle)
-  colnames(ataTri) <- colnames(triangle)[-ncol(triangle)]
+  ataTriangle <- ataTri(triangle)
+  row.names(ataTriangle) <- row.names(triangle)
+  colnames(ataTriangle) <- colnames(triangle)[-ncol(triangle)]
   
-  # ATA/ATU for oldest year will be our tail factor
-  results$ata[1] <- tail
-  results$atu[1] <- tail
-  
-  # latest loss for oldest year
-  results$latestLoss[1] <- triangle[1, ncol(triangle)]
-  # latest paid loss for oldest year
-  results$latestPaid[1] <- paidTri[1, ncol(paidTri)]
-  
-  # calculate ATA/ATU for remaining years
-  for(j in seq(ncol(triangle), 2, -1)){
-    # calculate position of latest AY for dev age j
-    i <- nrow(triangle) - j + 1 
-    # EDIT: calculate starting and ending index for number of years to take average of
-    end <- i
-    if(nyearAvg[j-1] > end){
-      start <- 1
-    } else{
-      start <- end - nyearAvg[j-1] + 1
-    }
-    # ATA for AY i+1 from age j-1 to j (all year weighted average)
-    if(wtdAvg[j-1]){
-      # all year weighted average ATA
-      results$ata[i+1] <- sum(ataTri[start:end,j-1]*triangle[start:end,j-1]) /
-                          sum(triangle[start:end,j-1])
-    } else{
-      # all year straight average ATA
-      results$ata[i+1] <- mean(ataTri[start:end,j-1])
-    }
-    
-    # ATU for AY i+1 from age j-1 to ult
-    results$atu[i+1] <- results$atu[i]*results$ata[i+1]
-    # latest loss for AY i+1
-    results$latestLoss[i+1] <- triangle[i+1, j-1]
-    # latest paid loss for AY i+1
-    results$latestPaid[i+1] <- paidTri[i+1, j-1]
-  }
+  # wtd all year avg
+  ataWtd <- c(tail, rev(avgWtd(triangle)))
+  # straight all year avg
+  ataStr <- c(tail, rev(avgStr(ataTriangle)))
+  # get selected ATA
+  results$ata <- c(ifelse(wtdAvg, ataWtd, ataStr), NA)
+  # get selected ATU
+  results$atu <- cumprod(results$ata)
   
   # ultimate loss
   results$ult <- results$latestLoss*results$atu
   # unpaid loss
   results$unpaid <- results$ult - results$latestPaid
   
-  # totals
+  # totals row - sums everything but last row (only for to-date and ultimate columns)
   results[nrow(results), c(2:3, 6:7)] <- sapply(c(2:3, 6:7),
                                                 function(x) sum(results[-nrow(results), x]))
   

@@ -64,6 +64,34 @@ getEarnPrem <- function(data){
   earnPrem  
 }
 
+# function to get last diagonal of a triangle, in vector form
+# this is done by taking the tail non-NA value for each row
+lastDiag <- function(tri) {
+  apply(tri, MARGIN=1, FUN=function(x) tail(na.omit(x),1))
+}
+
+
+# function to get age-to-age triangle based on an input triangle
+ataTri <- function(tri) {
+  sapply(2:ncol(tri), function(x) tri[,x]/tri[,x-1])
+}
+
+# function to get unweighted A-A all year avg
+avgStr <- function(aaTri) {
+  apply(aaTri, MARGIN=2, FUN=mean, na.rm=TRUE)
+}
+
+# function to get weighted A-A on a loss triangle
+avgWtd <- function(tri) {
+  aa <- ataTri(tri)
+  tri_x_last <- tri[, 1:(ncol(tri)-1)]
+  wtd <- aa * tri_x_last
+  # mask for values to consider
+  wtd_cell <- (!is.na(wtd))*1
+  return(apply(wtd, MARGIN=2, FUN=sum, na.rm=TRUE) / 
+           apply(wtd_cell * tri_x_last, MARGIN=2, FUN=sum, na.rm=TRUE))
+}
+
 # Chainladder development method
 # Arguments:
 # triangle = triangle matrix object to run the development method on
@@ -72,58 +100,38 @@ getEarnPrem <- function(data){
 #         = tail factor to use in development method
 # wtdAvg (optional, default value is not to use wtdAvg)
 #         = boolean vector indicating use of weighted averages for each dev age
-devMethod <- function(triangle, paidTri, tail=1, wtdAvg=rep(FALSE, ncol(triangle)-1)){
+# Return:
+#   list of results, including A-A vector, A-U vector, loss to date, 
+devMethod <- function(triangle, paidTri, tail=1, wtdAvg=rep(FALSE, ncol(triangle))){
   # data frame to store dev method results
   results <- data.frame(accYear = c(row.names(triangle), "Total"),
                         latestLoss = NA, latestPaid = NA,
                         ata = NA, atu = NA, ult = NA, unpaid = NA)
   
+  # get latest triangle losses and paid losses
+  results$latestLoss <- c(lastDiag(triangle), NA)
+  results$latestPaid <- c(lastDiag(paidTri), NA)
+  
   # create ATA triangle
-  ataTri <- sapply(2:ncol(triangle),
-                   function(x) triangle[,x]/triangle[,x-1])
-  row.names(ataTri) <- row.names(triangle)
-  colnames(ataTri) <- colnames(triangle)[-ncol(triangle)]
+  ataTriangle <- ataTri(triangle)
+  row.names(ataTriangle) <- row.names(triangle)
+  colnames(ataTriangle) <- colnames(triangle)[-ncol(triangle)]
   
-  # ATA/ATU for oldest year will be our tail factor
-  results$ata[1] <- tail
-  results$atu[1] <- tail
-  
-  # latest loss for oldest year
-  results$latestLoss[1] <- triangle[1, ncol(triangle)]
-  # latest paid loss for oldest year
-  results$latestPaid[1] <- paidTri[1, ncol(paidTri)]
-  
-  # calculate ATA/ATU for remaining years
-  for(j in seq(ncol(triangle), 2, -1)){
-    # calculate position of latest AY for dev age j
-    i <- nrow(triangle) - j + 1 
-    # calculate starting and ending index for number of years to take average of
-    end <- i
-    start <- 1
-    # ATA for AY i+1 from age j-1 to j (all year weighted average)
-    if(wtdAvg[j-1]){
-      # all year weighted average ATA
-      results$ata[i+1] <- sum(ataTri[start:end,j-1]*triangle[start:end,j-1]) /
-        sum(triangle[start:end,j-1])
-    } else{
-      # all year straight average ATA
-      results$ata[i+1] <- mean(ataTri[start:end,j-1])
-    }
-    
-    # ATU for AY i+1 from age j-1 to ult
-    results$atu[i+1] <- results$atu[i]*results$ata[i+1]
-    # latest loss for AY i+1
-    results$latestLoss[i+1] <- triangle[i+1, j-1]
-    # latest paid loss for AY i+1
-    results$latestPaid[i+1] <- paidTri[i+1, j-1]
-  }
+  # wtd all year avg
+  ataWtd <- c(tail, rev(avgWtd(triangle)))
+  # straight all year avg
+  ataStr <- c(tail, rev(avgStr(ataTriangle)))
+  # get selected ATA
+  results$ata <- c(ifelse(wtdAvg, ataWtd, ataStr), NA)
+  # get selected ATU
+  results$atu <- cumprod(results$ata)
   
   # ultimate loss
   results$ult <- results$latestLoss*results$atu
   # unpaid loss
   results$unpaid <- results$ult - results$latestPaid
   
-  # totals
+  # totals row - sums everything but last row (only for to-date and ultimate columns)
   results[nrow(results), c(2:3, 6:7)] <- sapply(c(2:3, 6:7),
                                                 function(x) sum(results[-nrow(results), x]))
   
