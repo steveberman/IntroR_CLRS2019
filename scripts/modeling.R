@@ -4,7 +4,7 @@
 ### modified by Steve Berman
 ### created 13Aug2019
 
-PATH <- "C:/Users/sberman/Documents/GitHub/IntroR_CLRS2019"
+PATH <- "C:/Users/spadhya/Documents/GitHub/IntroR_CLRS2019"
 
 ###############################################
 ### data load 
@@ -98,7 +98,7 @@ pred.test.lm <- predict(model.lm, test)
 
 # show actual vs. predictions of price on training data
 plot(train$price, pred.train.lm, pch = 20, col = rgb(0,0,0,0.1))
-abline(0, 1, col="light green", lty="dashed")
+abline(0, 1, col="red", lty="dashed")
 
 # get correlation on train
 (cor.train.lm <- cor(train$price, pred.train.lm))
@@ -106,7 +106,7 @@ abline(0, 1, col="light green", lty="dashed")
 
 # do same for test - this is the real validation of the model
 plot(test$price, pred.test.lm, pch = 20, col = rgb(0,0,0,0.1))
-abline(0, 1, col="light green", lty="dashed")
+abline(0, 1, col="red", lty="dashed")
 
 (cor.test.lm <- cor(test$price, pred.test.lm))
 # 0.9584838
@@ -142,14 +142,14 @@ pred.test.lm2 <- exp(predict(model.lm2, test))
 
 plot(train$price, pred.train.lm2, 
      pch = 20, col = rgb(0,0,0,0.1))
-abline(0,1, col="light green", lty="dashed")
+abline(0,1, col="red", lty="dashed")
 
 (cor.train.lm2 <- cor(train$price, pred.train.lm2))
 # 0.9686457
 
 plot(test$price, pred.test.lm2, 
      pch = 20, col = rgb(0,0,0,0.1))
-abline(0,1, col="light green", lty="dashed")
+abline(0,1, col="red", lty="dashed")
 
 (cor.test.lm2 <- cor(test$price, pred.test.lm2))
 # 0.8836964

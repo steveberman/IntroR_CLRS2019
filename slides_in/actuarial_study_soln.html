@@ -56,7 +56,7 @@ code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Inf
   </p>
 </div>
 <div id="your-turn" class="slide section level1">
-<h1>(6) Your turn</h1>
+<h1>(7) Your turn</h1>
 <p>Use the functions we created to run a reserve analysis for another insurer. As a reference point, insurers are represented by the GRCODE variable in our claims data set. Following are the different GRCODEs you can use:</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">unique</span>(claimsData<span class="op">$</span>GRCODE)</code></pre></div>
 <pre><code>## [1]  43 266 353 388 460</code></pre>
@@ -64,6 +64,10 @@ code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Inf
 <p><strong><em>compileData(data, insurerCode)</em></strong><br />
 <strong><em>createTriangles(data, triColName, triType)</em></strong><br />
 <strong><em>getEarnPrem(data)</em></strong><br />
+<strong><em>lastDiag(tri)</em></strong><br />
+<strong><em>ataTri(tri)</em></strong><br />
+<strong><em>avgStr(aaTri)</em></strong><br />
+<strong><em>avgWtd(tri)</em></strong><br />
 <strong><em>devMethod(triangle, paidTri, tail, wtdAvg)</em></strong><br />
 where <em>tail</em> and <em>wtdAvg</em> are optional arguments<br />
 <strong><em>IELR(rptdDev, paidDev, earnPrem, rptdWt, nyears, excludeYears)</em></strong><br />
@@ -71,7 +75,7 @@ where <em>rptdWt, nyears, excludeYears</em> are optional arguments<br />
 <strong><em>BF(devResults, ielrResults, triType)</em></strong></p>
 </div>
 <div id="your-turn-1" class="slide section level1">
-<h1>(6) Your turn</h1>
+<h1>(7) Your turn</h1>
 <p>We can use the functions we created to run a quick reserve analysis for another insurer.</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># initializing the list object that represents insurer's reserve analysis</span>
 insurer460 &lt;-<span class="st"> </span><span class="kw">list</span>(<span class="dt">data =</span> <span class="ot">NA</span>)
@@ -106,7 +110,7 @@ insurer460<span class="op">$</span>data &lt;-<span class="st"> </span><span clas
 ##  Max.   :1997   Max.   :120</code></pre>
 </div>
 <div id="your-turn-2" class="slide section level1">
-<h1>(6) Your turn</h1>
+<h1>(7) Your turn</h1>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># create paid and reported loss triangle</span>
 insurer460<span class="op">$</span>rptdTri &lt;-<span class="st"> </span><span class="kw">createTriangles</span>(insurer460<span class="op">$</span>data, <span class="st">&quot;IncurLoss&quot;</span>, <span class="st">&quot;Reported&quot;</span>)
 insurer460<span class="op">$</span>paidTri &lt;-<span class="st"> </span><span class="kw">createTriangles</span>(insurer460<span class="op">$</span>data, <span class="st">&quot;CumPaidLoss&quot;</span>, <span class="st">&quot;Paid&quot;</span>)
@@ -141,7 +145,7 @@ insurer460<span class="op">$</span>earnPrem</code></pre></div>
 ##   178   481   681  1348  2066  2279  2089  2917  3466  3407 18912</code></pre>
 </div>
 <div id="your-turn-3" class="slide section level1">
-<h1>(6) Your turn</h1>
+<h1>(7) Your turn</h1>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># calculate and store dev method results for insurer 460</span>
 <span class="co"># paid dev method</span>
 insurer460<span class="op">$</span>paidDev &lt;-<span class="st"> </span><span class="kw">devMethod</span>(<span class="dt">triangle =</span> insurer460<span class="op">$</span>paidTri,
@@ -204,7 +208,7 @@ insurer460<span class="op">$</span>paidDev</code></pre></div>
 ## 11    10780.1223 2603.122270</code></pre>
 </div>
 <div id="your-turn-4" class="slide section level1">
-<h1>(6) Your turn</h1>
+<h1>(7) Your turn</h1>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># calculate and store IELR method results for insurer 460</span>
 insurer460<span class="op">$</span>ielr &lt;-<span class="st"> </span><span class="kw">IELR</span>(<span class="dt">rptdDev =</span> insurer460<span class="op">$</span>rptdDev, <span class="dt">paidDev =</span> insurer460<span class="op">$</span>paidDev,
                        <span class="dt">earnPrem =</span> insurer460<span class="op">$</span>earnPrem)
@@ -247,7 +251,7 @@ insurer460<span class="op">$</span>ielr</code></pre></div>
 ## Total       1045.64557</code></pre>
 </div>
 <div id="your-turn-5" class="slide section level1">
-<h1>(6) Your turn</h1>
+<h1>(7) Your turn</h1>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># calculate and store B-F method results for insurer 460</span>
 insurer460<span class="op">$</span>paidBF &lt;-<span class="st"> </span><span class="kw">BF</span>(insurer460<span class="op">$</span>paidDev, insurer460<span class="op">$</span>ielr, <span class="st">&quot;Paid&quot;</span>)
 insurer460<span class="op">$</span>rptdBF &lt;-<span class="st"> </span><span class="kw">BF</span>(insurer460<span class="op">$</span>rptdDev, insurer460<span class="op">$</span>ielr, <span class="st">&quot;Reported&quot;</span>)
@@ -327,81 +331,101 @@ insurer460<span class="op">$</span>paidBF</code></pre></div>
 ## 11     2601.254302</code></pre>
 </div>
 <div id="extra-credit" class="slide section level1">
-<h1>(7) Extra Credit!</h1>
+<h1>(8) Extra Credit!</h1>
 <p>If you are feeling overly ambitious today and want to improve your LDF selections, modify the devMethod() function we created to take in an argument nyearAvg, which would be a vector representing the number of recent years to include to get your LDF average for every development age.</p>
 <p>For example, for a 10x10 triangle, nyearAvg would be a 1x9 numeric vector. If the first element of the vector is 5, the devMethod() function would calculate a 5-year average of 12-24 month ATAs.</p>
 <p>Hint: In our function, you need to vary the start variable by the nyearAvg argument.</p>
 </div>
 <div id="extra-credit-1" class="slide section level1">
 <h1>(7) Extra Credit!</h1>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># Chainladder development method</span>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">### function: avgStr
+### purpose: get unweighted A-A all year avg
+### arguments: aaTri = age-to-age triangle matrix object
+avgStr &lt;-<span class="st"> </span><span class="cf">function</span>(aaTri, nyearAvg) {
+  strAvg &lt;-<span class="st"> </span><span class="kw">c</span>()
+  <span class="cf">for</span>(j <span class="cf">in</span> <span class="kw">seq</span>(<span class="dv">1</span>, <span class="kw">ncol</span>(aaTri))){
+    <span class="co"># calculate position of latest AY for dev age j</span>
+    i &lt;-<span class="st"> </span><span class="kw">nrow</span>(aaTri) <span class="op">-</span><span class="st"> </span>j
+    <span class="co"># EDIT: calculate starting and ending index for number of years to take average of</span>
+    end &lt;-<span class="st"> </span>i
+    <span class="cf">if</span>(nyearAvg[j] <span class="op">&gt;</span><span class="st"> </span>end){
+      start &lt;-<span class="st"> </span><span class="dv">1</span>
+    } <span class="cf">else</span>{
+      start &lt;-<span class="st"> </span>end <span class="op">-</span><span class="st"> </span>nyearAvg[j] <span class="op">+</span><span class="st"> </span><span class="dv">1</span>
+    }
+    <span class="co"># all year straight average ATA</span>
+    strAvg &lt;-<span class="st"> </span><span class="kw">c</span>(strAvg, <span class="kw">mean</span>(aaTri[start<span class="op">:</span>end,j]))
+  }
+  <span class="kw">return</span>(strAvg)
+}
+
+### function: avgWtd
+### purpose: get weighted A-A all year avg
+### arguments: tri = triangle matrix object
+avgWtd &lt;-<span class="st"> </span><span class="cf">function</span>(tri, nyearAvg) {
+  aaTri &lt;-<span class="st"> </span><span class="kw">ataTri</span>(tri)
+  wtdAvg &lt;-<span class="st"> </span><span class="kw">c</span>()
+  <span class="cf">for</span>(j <span class="cf">in</span> <span class="kw">seq</span>(<span class="dv">1</span>, <span class="kw">ncol</span>(aaTri))){
+    <span class="co"># calculate position of latest AY for dev age j</span>
+    i &lt;-<span class="st"> </span><span class="kw">nrow</span>(aaTri) <span class="op">-</span><span class="st"> </span>j
+    <span class="co"># EDIT: calculate starting and ending index for number of years to take average of</span>
+    end &lt;-<span class="st"> </span>i
+    <span class="cf">if</span>(nyearAvg[j] <span class="op">&gt;</span><span class="st"> </span>end){
+      start &lt;-<span class="st"> </span><span class="dv">1</span>
+    } <span class="cf">else</span>{
+      start &lt;-<span class="st"> </span>end <span class="op">-</span><span class="st"> </span>nyearAvg[j] <span class="op">+</span><span class="st"> </span><span class="dv">1</span>
+    }
+    
+    <span class="co"># all year weighted average ATA</span>
+    wtdAvg &lt;-<span class="st"> </span><span class="kw">c</span>(wtdAvg, <span class="kw">sum</span>(aaTri[start<span class="op">:</span>end,j]<span class="op">*</span>tri[start<span class="op">:</span>end,j]) <span class="op">/</span>
+<span class="st">                  </span><span class="kw">sum</span>(tri[start<span class="op">:</span>end,j]))
+  }
+  <span class="kw">return</span>(wtdAvg)
+}
+
+<span class="co"># Chainladder development method</span>
 <span class="co"># Arguments:</span>
 <span class="co"># triangle = triangle matrix object to run the development method on</span>
 <span class="co"># paidTri = paid loss triangle matrix object to get unpaid loss</span>
 <span class="co"># tail (optional, default value = 1)</span>
 <span class="co">#         = tail factor to use in development method</span>
-<span class="co"># wtdAvg (optional, default value is not to use straight average)</span>
+<span class="co"># wtdAvg (optional, default value is not to use wtdAvg)</span>
 <span class="co">#         = boolean vector indicating use of weighted averages for each dev age</span>
 <span class="co"># nyearAvg (optional, default value is not to use all years)</span>
 <span class="co">#         = numeric vector giving the number of recent years to include</span>
 <span class="co">#           to get your LDF average for every development age</span>
-devMethod &lt;-<span class="st"> </span><span class="cf">function</span>(triangle, paidTri, <span class="dt">tail=</span><span class="dv">1</span>, <span class="dt">wtdAvg=</span><span class="kw">rep</span>(<span class="ot">FALSE</span>, <span class="kw">ncol</span>(triangle)<span class="op">-</span><span class="dv">1</span>),
-                      <span class="dt">nyearAvg=</span><span class="kw">rep</span>(<span class="kw">nrow</span>(triangle)<span class="op">-</span><span class="dv">1</span>, <span class="kw">ncol</span>(triangle)<span class="op">-</span><span class="dv">1</span>)){
+<span class="co"># Return:</span>
+<span class="co">#   list of results, including A-A vector, A-U vector, loss to date, </span>
+devMethod &lt;-<span class="st"> </span><span class="cf">function</span>(triangle, paidTri, <span class="dt">tail=</span><span class="dv">1</span>, <span class="dt">wtdAvg=</span><span class="kw">rep</span>(<span class="ot">FALSE</span>, <span class="kw">ncol</span>(triangle)), <span class="dt">nyearAvg=</span><span class="kw">rep</span>(<span class="kw">nrow</span>(triangle)<span class="op">-</span><span class="dv">1</span>, <span class="kw">ncol</span>(triangle)<span class="op">-</span><span class="dv">1</span>)){
   <span class="co"># data frame to store dev method results</span>
   results &lt;-<span class="st"> </span><span class="kw">data.frame</span>(<span class="dt">accYear =</span> <span class="kw">c</span>(<span class="kw">row.names</span>(triangle), <span class="st">&quot;Total&quot;</span>),
                         <span class="dt">latestLoss =</span> <span class="ot">NA</span>, <span class="dt">latestPaid =</span> <span class="ot">NA</span>,
                         <span class="dt">ata =</span> <span class="ot">NA</span>, <span class="dt">atu =</span> <span class="ot">NA</span>, <span class="dt">ult =</span> <span class="ot">NA</span>, <span class="dt">unpaid =</span> <span class="ot">NA</span>)
   
+  <span class="co"># get latest triangle losses and paid losses</span>
+  results<span class="op">$</span>latestLoss &lt;-<span class="st"> </span><span class="kw">c</span>(<span class="kw">lastDiag</span>(triangle), <span class="ot">NA</span>)
+  results<span class="op">$</span>latestPaid &lt;-<span class="st"> </span><span class="kw">c</span>(<span class="kw">lastDiag</span>(paidTri), <span class="ot">NA</span>)
+  
   <span class="co"># create ATA triangle</span>
-  ataTri &lt;-<span class="st"> </span><span class="kw">sapply</span>(<span class="dv">2</span><span class="op">:</span><span class="kw">ncol</span>(triangle),
-                   <span class="cf">function</span>(x) triangle[,x]<span class="op">/</span>triangle[,x<span class="op">-</span><span class="dv">1</span>])
-  <span class="kw">row.names</span>(ataTri) &lt;-<span class="st"> </span><span class="kw">row.names</span>(triangle)
-  <span class="kw">colnames</span>(ataTri) &lt;-<span class="st"> </span><span class="kw">colnames</span>(triangle)[<span class="op">-</span><span class="kw">ncol</span>(triangle)]
+  ataTriangle &lt;-<span class="st"> </span><span class="kw">ataTri</span>(triangle)
+  <span class="kw">row.names</span>(ataTriangle) &lt;-<span class="st"> </span><span class="kw">row.names</span>(triangle)
+  <span class="kw">colnames</span>(ataTriangle) &lt;-<span class="st"> </span><span class="kw">colnames</span>(triangle)[<span class="op">-</span><span class="kw">ncol</span>(triangle)]
   
-  <span class="co"># ATA/ATU for oldest year will be our tail factor</span>
-  results<span class="op">$</span>ata[<span class="dv">1</span>] &lt;-<span class="st"> </span>tail
-  results<span class="op">$</span>atu[<span class="dv">1</span>] &lt;-<span class="st"> </span>tail
-  
-  <span class="co"># latest loss for oldest year</span>
-  results<span class="op">$</span>latestLoss[<span class="dv">1</span>] &lt;-<span class="st"> </span>triangle[<span class="dv">1</span>, <span class="kw">ncol</span>(triangle)]
-  <span class="co"># latest paid loss for oldest year</span>
-  results<span class="op">$</span>latestPaid[<span class="dv">1</span>] &lt;-<span class="st"> </span>paidTri[<span class="dv">1</span>, <span class="kw">ncol</span>(paidTri)]
-  
-  <span class="co"># calculate ATA/ATU for remaining years</span>
-  <span class="cf">for</span>(j <span class="cf">in</span> <span class="kw">seq</span>(<span class="kw">ncol</span>(triangle), <span class="dv">2</span>, <span class="op">-</span><span class="dv">1</span>)){
-    <span class="co"># calculate position of latest AY for dev age j</span>
-    i &lt;-<span class="st"> </span><span class="kw">nrow</span>(triangle) <span class="op">-</span><span class="st"> </span>j <span class="op">+</span><span class="st"> </span><span class="dv">1</span> 
-    <span class="co"># EDIT: calculate starting and ending index for number of years to take average of</span>
-    end &lt;-<span class="st"> </span>i
-    <span class="cf">if</span>(nyearAvg[j<span class="op">-</span><span class="dv">1</span>] <span class="op">&gt;</span><span class="st"> </span>end){
-      start &lt;-<span class="st"> </span><span class="dv">1</span>
-    } <span class="cf">else</span>{
-      start &lt;-<span class="st"> </span>end <span class="op">-</span><span class="st"> </span>nyearAvg[j<span class="op">-</span><span class="dv">1</span>] <span class="op">+</span><span class="st"> </span><span class="dv">1</span>
-    }
-    <span class="co"># ATA for AY i+1 from age j-1 to j (all year weighted average)</span>
-    <span class="cf">if</span>(wtdAvg[j<span class="op">-</span><span class="dv">1</span>]){
-      <span class="co"># all year weighted average ATA</span>
-      results<span class="op">$</span>ata[i<span class="op">+</span><span class="dv">1</span>] &lt;-<span class="st"> </span><span class="kw">sum</span>(ataTri[start<span class="op">:</span>end,j<span class="op">-</span><span class="dv">1</span>]<span class="op">*</span>triangle[start<span class="op">:</span>end,j<span class="op">-</span><span class="dv">1</span>]) <span class="op">/</span>
-<span class="st">                          </span><span class="kw">sum</span>(triangle[start<span class="op">:</span>end,j<span class="op">-</span><span class="dv">1</span>])
-    } <span class="cf">else</span>{
-      <span class="co"># all year straight average ATA</span>
-      results<span class="op">$</span>ata[i<span class="op">+</span><span class="dv">1</span>] &lt;-<span class="st"> </span><span class="kw">mean</span>(ataTri[start<span class="op">:</span>end,j<span class="op">-</span><span class="dv">1</span>])
-    }
-    
-    <span class="co"># ATU for AY i+1 from age j-1 to ult</span>
-    results<span class="op">$</span>atu[i<span class="op">+</span><span class="dv">1</span>] &lt;-<span class="st"> </span>results<span class="op">$</span>atu[i]<span class="op">*</span>results<span class="op">$</span>ata[i<span class="op">+</span><span class="dv">1</span>]
-    <span class="co"># latest loss for AY i+1</span>
-    results<span class="op">$</span>latestLoss[i<span class="op">+</span><span class="dv">1</span>] &lt;-<span class="st"> </span>triangle[i<span class="op">+</span><span class="dv">1</span>, j<span class="op">-</span><span class="dv">1</span>]
-    <span class="co"># latest paid loss for AY i+1</span>
-    results<span class="op">$</span>latestPaid[i<span class="op">+</span><span class="dv">1</span>] &lt;-<span class="st"> </span>paidTri[i<span class="op">+</span><span class="dv">1</span>, j<span class="op">-</span><span class="dv">1</span>]
-  }
+  <span class="co"># wtd all year avg</span>
+  ataWtd &lt;-<span class="st"> </span><span class="kw">c</span>(tail, <span class="kw">rev</span>(<span class="kw">avgWtd</span>(triangle, nyearAvg)))
+  <span class="co"># straight all year avg</span>
+  ataStr &lt;-<span class="st"> </span><span class="kw">c</span>(tail, <span class="kw">rev</span>(<span class="kw">avgStr</span>(ataTriangle, nyearAvg)))
+  <span class="co"># get selected ATA</span>
+  results<span class="op">$</span>ata &lt;-<span class="st"> </span><span class="kw">c</span>(<span class="kw">ifelse</span>(wtdAvg, ataWtd, ataStr), <span class="ot">NA</span>)
+  <span class="co"># get selected ATU</span>
+  results<span class="op">$</span>atu &lt;-<span class="st"> </span><span class="kw">cumprod</span>(results<span class="op">$</span>ata)
   
   <span class="co"># ultimate loss</span>
   results<span class="op">$</span>ult &lt;-<span class="st"> </span>results<span class="op">$</span>latestLoss<span class="op">*</span>results<span class="op">$</span>atu
   <span class="co"># unpaid loss</span>
   results<span class="op">$</span>unpaid &lt;-<span class="st"> </span>results<span class="op">$</span>ult <span class="op">-</span><span class="st"> </span>results<span class="op">$</span>latestPaid
   
-  <span class="co"># totals</span>
+  <span class="co"># totals row - sums everything but last row (only for to-date and ultimate columns)</span>
   results[<span class="kw">nrow</span>(results), <span class="kw">c</span>(<span class="dv">2</span><span class="op">:</span><span class="dv">3</span>, <span class="dv">6</span><span class="op">:</span><span class="dv">7</span>)] &lt;-<span class="st"> </span><span class="kw">sapply</span>(<span class="kw">c</span>(<span class="dv">2</span><span class="op">:</span><span class="dv">3</span>, <span class="dv">6</span><span class="op">:</span><span class="dv">7</span>),
                                                 <span class="cf">function</span>(x) <span class="kw">sum</span>(results[<span class="op">-</span><span class="kw">nrow</span>(results), x]))
   

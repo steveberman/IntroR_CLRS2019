@@ -1,159 +1,150 @@
 ---
 title: "Visualization"
 output:
-  revealjs::revealjs_presentation:
-    center: no
-    css: ../css/revealOpts.css
-    reveal_plugins:
-    - notes
-    - zoom
-    self_contained: false
-    theme: solarized
-    transition: slide
+  slidy_presentation:
+    duration: 60
+  ioslides_presentation: default
 ---
 
 ```{r include=FALSE}
 source('common.R')
 ```
 
-# Base plotting
-
-## Base plotting (1)
+# Base Plotting (Stone Age)
 
 ```{r}
 library(raw)    # R Actuarial Workshop
 data("RegionExperience")
-RegionExperience$Region_f <- factor(RegionExperience$Region)
 
 head(RegionExperience, 3)
-
+summary(RegionExperience)
 ```
 
-## Base plotting (2)
 
 ```{r}
-# basic plotting
-plot(RegionExperience$PolicyYear, RegionExperience$NumClaims)
+# basic plot
+plot(x=RegionExperience$PolicyYear, y=RegionExperience$NumPolicies)
 ```
 
 
-## Add labels
-
-```{r}
-# some more customization
-# ex: pch affects how the "dot" looks
-plot(RegionExperience$PolicyYear
-  , RegionExperience$NumClaims
-  , pch = 19
-  , xlab = 'Policy Year'
-  , ylab = '# of claims')
-```
-
-## Some more customization
+# Base Plotting
 
 ```{r}
 # some more customization
 # ex: pch affects how the "dot" looks
-plot(RegionExperience$PolicyYear
-  , RegionExperience$NumClaims
-  , col = RegionExperience$Region_f
-  , pch = 19
-  , xlab = 'Policy Year', ylab = '# of claims'
-  , main = 'Claim counts', ylim=c(0, 10000))
+plot(x=RegionExperience$PolicyYear, y=RegionExperience$NumPolicies,
+     pch = 19, xlab = 'Policy Year', ylab = '# of policies')
+```
+
+# Base Plotting
+
+```{r}
+# some more customization
+plot(x=RegionExperience$PolicyYear, y=RegionExperience$NumPolicies,
+     col = RegionExperience$Region,
+     pch = 19, xlab = 'Policy Year', ylab = '# of policies',
+     main = 'Policy counts', ylim=c(0, 1000))
 ```
 
 
-## Base plotting
+# Base Plotting
 
 * Kinda ugly
 * Customization is possible, but tedious
 
-# ggplot
-
-## ggplot2
+# ggplot (Iron Age)
 
 gg =  "grammar of graphics" based on Leland Wilkinson
 
 1. Data
 2. Mapping
-2. Geometric layers
-3. Scales
+3. Layers
+4. Scales
+5. Facets
+6. Non-data Visual Elements
 
 # ggplot - Data
-
-## ggplot - Data
 
 ```{r error = TRUE}
 library(ggplot2)
 library(dplyr)
-plt_base <- ggplot(RegionExperience)
 
-plt_base
+# initialize ggplot() object
+plt_base <- ggplot(data=RegionExperience)
+plt_base # blank plot
+```
+
+# ggplot - Data
+
+Data loaded into ggplot() must be a data frame.
+
+```{r error=TRUE}
+ggplot(1:10)
 
 data(COTOR2)
+class(COTOR2)
 ggplot(COTOR2)
 ```
 
-## ggplot - Data
-
-Data must use a data frame.
-
-```{r}
-ggplot(1:10)
-```
-
 # ggplot - Mapping
-
-## ggplot - Mapping
 
 Mappings bind data to visual elements. Every data-derived visual element must be mapped to data.
 
 ```{r }
 # aes = aesthetic mapping
-plt_base <- plt_base + aes(x=PolicyYear, y=NumClaims)
+plt_base <- plt_base + aes(x=PolicyYear, y=NumPolicies)
+plt_base
 
-plt_base <- ggplot(RegionExperience, aes(PolicyYear, NumClaims))
+# another way of adding a mapping
+plt_base <- ggplot(data=RegionExperience,
+                   mapping=aes(x=PolicyYear, y=NumPolicies))
+plt_base
 ```
 
 # ggplot - Layers
 
-## Adding layers
+Adding layers
 
-Although we have data and we've mapped to elements of a coordinate system, we haven't specified what the visual elements should be. The `geom_*` family of functions add geometric shapes. 
+Although we have data and we've mapped to elements of a coordinate system, we haven't specified what the visual elements should be. The `geom_*` family of functions adds geometric shapes. 
 
 ```{r }
 plt_base <- plt_base + geom_point()
 plt_base
 ```
 
-## One step
+Let's do everything in one step now
 
 ```{r }
-# note pipe operator
+# dataset on left of pipe operator can be used
+# on the right of pipe operator without referencing the dataset 
 RegionExperience %>% 
   ggplot(aes(x=PolicyYear, y=NumPolicies)) + 
   geom_point()
 ```
 
-## Try multiple layers
+# ggplot - Layers
+
+Let's add more layers by connecting the data points by a line.
 
 ```{r }
 RegionExperience %>% 
   ggplot(aes(x=PolicyYear, y=NumPolicies)) + 
   geom_point() + 
-  geom_line()
+  geom_line() # connect scatterplot with lines
 ```
 
-## Try that again
+That looks ugly because of the step differences in number of policies between different regions. Let's try connecting the data points for each region by a line.
 
 ```{r }
 RegionExperience %>% 
   ggplot(aes(x=PolicyYear, y=NumPolicies)) + 
   geom_point() + 
-  geom_line(aes(color=Region))
+  geom_line(aes(color=Region)) # we use color to map lines to regions
 ```
 
-## Statistical smoothers
+# ggplot - Layers
+
+Let's make the lines smoother by fitting a linear regression to the data points by region.
 
 ```{r}
 RegionExperience %>% 
@@ -162,28 +153,29 @@ RegionExperience %>%
   geom_smooth(method=lm, aes(color=Region))
 ```
 
-# Scales
+# ggplot - Scales
 
-## Store a basic plot in an object
+Store a basic plot in an object
 
 ```{r}
 plt <- RegionExperience %>% 
-  ggplot(aes(x=PolicyYear, y=NumClaims)) + geom_point()
+  ggplot(aes(x=PolicyYear, y=NumPolicies)) +
+  geom_point()
 ```
 
-## Change the y scale
+Change the y scale and labels
 
 ```{r}
-plt + scale_y_continuous(labels = scales::comma)
+plt + scale_y_continuous(limits = c(0,1000), labels = scales::comma)
 ```
 
-## Change the x breaks
+Change the x breaks
 
 ```{r}
 plt + scale_x_continuous(breaks = 2001:2010)
 ```
 
-## Change the x breaks
+Change the x breaks
 
 ```{r}
 my_breaks <- function(lims) {
@@ -192,52 +184,48 @@ my_breaks <- function(lims) {
 plt + scale_x_continuous(breaks=my_breaks)
 ```
 
-# Facets
+# ggplot - Facets
 
-## Facets
-
-Facets split the data into groups and draws a different plot for each group.
+Facets split the data into groups and draw a different plot for each group.
 
 ```{r}
-ggplot(RegionExperience, aes(x=PolicyYear, y=NumClaims, color=Region)) + 
-  geom_point() + facet_wrap(~ Region)
+RegionExperience %>%
+  ggplot(aes(x=PolicyYear, y=NumPolicies, color=Region)) + 
+  geom_point() + facet_wrap(~Region)
 ```
 
-# Non-data visual elements
-
-## Non-data visual elements
+# ggplot - Non-data visual elements
 
 * labels
 * gridlines
 * legend
 * axis ticks
 
-## Labels
+# ggplot - Non-data visual elements
+
+Labels
 
 ```{r}
-plt + labs(x = 'Policy year', y = '# of claims')
+plt + labs(x = 'Policy year', y = '# of policies')
 ```
 
-## Gridlines, legends, axis ticks
+Gridlines, legends, axis ticks
 
 ```{r}
-plt + aes(color="Region") + labs(x = 'Policy year', y = '# of claims', color = "Region") +
-   theme(panel.grid.major = element_line(colour = "black")) +
+plt + aes(color=Region) + labs(x = 'Policy year', y = '# of policies', color = "Region") +
+   theme(panel.grid.major = element_line(colour = "azure4", linetype = "dashed")) +
    theme(axis.text = element_text(colour = "blue"))
 ```
 
 
+# Stuff you can do with ggplot:
 
-## Stuff you can do with ggplot:
-
-Line chart, bar chart, boxplot, scatterplots, dumbbell plot, violin plot, heatmaps, trellis plots, slopecharts, more!
+Line chart, bar chart, boxplot, scatterplots, dumbbell plot, violin plot, heatmaps, trellis plots, slopecharts, and more!
 
 # Exercises
 
-## Exercises
-
-1. Create a scatter plot for policy year and number of claims
-2. Color each point based on region
+1. Create a scatter plot for policy year and number of claims.
+2. Color each point based on region.
 3. Add a linear smoother. Which region is showing the greatest increase in claims?
 4. Form the policy frequency by taking the ratio of claims to policies. Plot this.
 
@@ -245,7 +233,7 @@ Extra credit:
 
 Use the state data to create a time series number of claims. Facet by region.
 
-## Solutions (1):
+# Solutions (1):
 
 ```{r}
 library(raw)
@@ -254,20 +242,20 @@ plt1 <- ggplot(RegionExperience, aes(x = PolicyYear, y = NumClaims)) + geom_poin
 plt1
 ```
 
-## Solutions (2):
+# Solutions (2):
 
 ```{r}
 plt2 <- plt1 + aes(color=Region)
 plt2
 ```
 
-## Solutions (3):
+# Solutions (3):
 ```{r}
 plt3 <- plt2 + stat_smooth(method = "lm")
 plt3
 ```
 
-## Solutions (4):
+# Solutions (4):
 ```{r}
 RegionExperience$Frequency <- with(RegionExperience, NumClaims / NumPolicies)
 
@@ -276,7 +264,7 @@ plt4 <- ggplot(RegionExperience, aes(x=PolicyYear, y=Frequency, color=Region)) +
 plt4
 ```
 
-## Solutions (EC):
+# Solutions (EC):
 ```{r}
 data("StateExperience")
 pltExtra <- ggplot(StateExperience, aes(x=PolicyYear, y=NumClaims, color=Postal)) +
@@ -284,7 +272,7 @@ pltExtra <- ggplot(StateExperience, aes(x=PolicyYear, y=NumClaims, color=Postal)
 pltExtra + facet_wrap(~ Region)
 ```
 
-## Summary
+# Summary
 
 * `ggplot2` is different at first, but will repay your investment.
 * Works very well with grouped data to color/facet points.

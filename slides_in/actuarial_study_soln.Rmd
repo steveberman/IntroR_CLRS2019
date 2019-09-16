@@ -116,21 +116,46 @@ Hint: In our function, you need to vary the start variable by the nyearAvg argum
 ### function: avgStr
 ### purpose: get unweighted A-A all year avg
 ### arguments: aaTri = age-to-age triangle matrix object
-avgStr <- function(aaTri) {
-  apply(aaTri, MARGIN=2, FUN=mean, na.rm=TRUE)
+avgStr <- function(aaTri, nyearAvg) {
+  strAvg <- c()
+  for(j in seq(1, ncol(aaTri))){
+    # calculate position of latest AY for dev age j
+    i <- nrow(aaTri) - j
+    # EDIT: calculate starting and ending index for number of years to take average of
+    end <- i
+    if(nyearAvg[j] > end){
+      start <- 1
+    } else{
+      start <- end - nyearAvg[j] + 1
+    }
+    # all year straight average ATA
+    strAvg <- c(strAvg, mean(aaTri[start:end,j]))
+  }
+  return(strAvg)
 }
 
 ### function: avgWtd
 ### purpose: get weighted A-A all year avg
 ### arguments: tri = triangle matrix object
-avgWtd <- function(tri) {
-  aa <- ataTri(tri)
-  tri_x_last <- tri[, 1:(ncol(tri)-1)]
-  wtd <- aa * tri_x_last
-  # mask for values to consider
-  wtd_cell <- (!is.na(wtd))*1
-  return(apply(wtd, MARGIN=2, FUN=sum, na.rm=TRUE) / 
-           apply(wtd_cell * tri_x_last, MARGIN=2, FUN=sum, na.rm=TRUE))
+avgWtd <- function(tri, nyearAvg) {
+  aaTri <- ataTri(tri)
+  wtdAvg <- c()
+  for(j in seq(1, ncol(aaTri))){
+    # calculate position of latest AY for dev age j
+    i <- nrow(aaTri) - j
+    # EDIT: calculate starting and ending index for number of years to take average of
+    end <- i
+    if(nyearAvg[j] > end){
+      start <- 1
+    } else{
+      start <- end - nyearAvg[j] + 1
+    }
+    
+    # all year weighted average ATA
+    wtdAvg <- c(wtdAvg, sum(aaTri[start:end,j]*tri[start:end,j]) /
+                  sum(tri[start:end,j]))
+  }
+  return(wtdAvg)
 }
 
 # Chainladder development method
@@ -141,9 +166,12 @@ avgWtd <- function(tri) {
 #         = tail factor to use in development method
 # wtdAvg (optional, default value is not to use wtdAvg)
 #         = boolean vector indicating use of weighted averages for each dev age
+# nyearAvg (optional, default value is not to use all years)
+#         = numeric vector giving the number of recent years to include
+#           to get your LDF average for every development age
 # Return:
 #   list of results, including A-A vector, A-U vector, loss to date, 
-devMethod <- function(triangle, paidTri, tail=1, wtdAvg=rep(FALSE, ncol(triangle))){
+devMethod <- function(triangle, paidTri, tail=1, wtdAvg=rep(FALSE, ncol(triangle)), nyearAvg=rep(nrow(triangle)-1, ncol(triangle)-1)){
   # data frame to store dev method results
   results <- data.frame(accYear = c(row.names(triangle), "Total"),
                         latestLoss = NA, latestPaid = NA,
@@ -159,9 +187,9 @@ devMethod <- function(triangle, paidTri, tail=1, wtdAvg=rep(FALSE, ncol(triangle
   colnames(ataTriangle) <- colnames(triangle)[-ncol(triangle)]
   
   # wtd all year avg
-  ataWtd <- c(tail, rev(avgWtd(triangle)))
+  ataWtd <- c(tail, rev(avgWtd(triangle, nyearAvg)))
   # straight all year avg
-  ataStr <- c(tail, rev(avgStr(ataTriangle)))
+  ataStr <- c(tail, rev(avgStr(ataTriangle, nyearAvg)))
   # get selected ATA
   results$ata <- c(ifelse(wtdAvg, ataWtd, ataStr), NA)
   # get selected ATU
